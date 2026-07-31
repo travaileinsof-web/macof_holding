@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+api/node_modules/
+frontend/node_modules/
+
+# Build outputs
+api/dist/
+frontend/dist/
+
+# Environment files
+.env
+.env.local
+.env.production
+api/.env
+frontend/.env
+
+# Drizzle
+api/drizzle/
+
+# Vercel
+.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Uploads (local dev)
+backend/storage/
+backend/public/uploads/
+
+# Deploy
+macof-deploy/
+
+# Python
+__pycache__/
+*.pyc
+
+# Misc
+*.bak
+.cache/
+
+# ZCode local plans
+.zcode/
+
+# Temp scripts
+remove_bg.py
+test.py
+replace_url.js
+package_deploy.js
+seed.sql
+macof-deploy/

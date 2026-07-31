@@ -1,0 +1,140 @@
+/* 
+ * MACOF Holding - Custom Admin Styles (Premium Version)
+ */
+
+body.hidden {
+    display: none !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+}
+
+/* Custom Scrollbar for a sleek look */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+ 
+::-webkit-scrollbar-thumb {
+    background: rgba(205, 164, 52, 0.3); /* Macof Gold with opacity */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(205, 164, 52, 0.6); 
+}
+
+/* Glassmorphism Classes for Cards and Modals */
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.05);
+}
+
+.macof-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    background-color: #f8fafc;
+    transition: all 0.2s;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.875rem;
+}
+
+.macof-input:focus {
+    outline: none;
+    border-color: #cda434;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(205, 164, 52, 0.1);
+}
+
+.macof-btn-primary {
+    background-color: #0f172a;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.06);
+}
+
+.macof-btn-primary:hover {
+    background-color: #1e293b;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+}
+
+.macof-btn-gold {
+    background-color: #cda434;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(205, 164, 52, 0.2), 0 2px 4px -1px rgba(205, 164, 52, 0.1);
+}
+
+.macof-btn-gold:hover {
+    background-color: #b38f2d;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(205, 164, 52, 0.3), 0 4px 6px -2px rgba(205, 164, 52, 0.15);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    animation: slideUp 0.3s ease-out;
+}
+
+/* Table styles */
+.macof-table th {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+}
+
+.macof-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    font-size: 0.875rem;
+}
+
+.macof-table tr:hover td {
+    background-color: #f8fafc;
+}

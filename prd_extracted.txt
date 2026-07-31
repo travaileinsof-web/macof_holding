@@ -1,0 +1,990 @@
+PRÉPARÉPAREINSOFDIGITRÉF . ED-CC-MACOF-2026-01 CONAKRY,RÉPUBL IQUEDEGU INÉE  
+CAH I ERDECHARGES·PROJETWEBCORPORATE 
+PlateformeWeb 
+MACOFHOLDING  
+Conception&développementdusite institutionnel 
+multi-domaines de la holding  
+Le présent cahier de charges définit le cadre technique,  
+fonctionnel et organisationnel de la conception, du  
+développement et de la mise en ligne de la plateforme web corporate 
+de MACOF Holding, holding guinéenne structurée autour de six filiales 
+sectorielles : Immobilier & BTP, Restauration, Communication, Mining, 
+Transit et Fishing.  
+C L I E N T  
+MACOF HOLDING  
+M 
+P R E S TA TA I R E  
+EINSOF DIGIT  
+Manquepa, face de Banc Bleu, Kaloum 
+Conakry, République de Guinée  
+D O C U M EN T C O N F I D EN T I EL  
+É D I T I O N J A N VI ER 2 0 2 6 · VER S I O N 1 . 0  
+Tél. +224 624 77 06 18  
+23/01/2026  
+PAGE1/COUVERTURE 
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+Table des matières  
+1. Préambule et contexte du projet 3 1.1 Présentation du commanditaire . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . 3 1.2 Contexte et enjeux stratégiques . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . 3 1.3 Objet du document . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4  
+2. Présentation du Client — MACOF HOLDING 5 2.1 Identité du groupe . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . 5 2.2 Historique et parcours . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . 5 2.3 Vision et mission . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5 
+2.4 Organisation en filiales . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5  
+3. Analyse détaillée des domaines d'activité 7 3.1 MACOF Immobilier SARL — Immobilier & BTP . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7 3.2 MACOF Restauration SARL — Restauration . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . 7 3.3 MACOF Print & Com SARL — Communication & Impression . . . . . . . 
+. . . . . . . . . . . . . . . . 8 3.4 MACOF Mining SARL — Activités minières . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . 8 3.5 MACOF Transit SARL — Transit, Logistique & Voyages . . . . . . . . . . . . . . . . . . . . . . . . . 
+. 9 3.6 MACOF Fishing SARL — Pêche & Ressources halieutiques . . . . . . . . . . . . . . . . . . . . . . . . . 9  
+4. Objectifs et périmètre du projet web 11 4.1 Objectifs stratégiques . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . 11 4.2 Publics cibles . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . 11 4.3 Périmètre fonctionnel . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12 4.4 
+Hors-périmètre . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12  
+5. Architecture de l'information et arborescence 13 5.1 Arborescence principale . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 5.2 Principes de navigation . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . 13 5.3 Maillage interne et SEO . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . 14  
+6. Spécifications fonctionnelles détaillées — Page par page 15 6.1 Page d'accueil . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15 6.2 Page À propos . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 15 6.3 Page Domaines d'activité . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . 16 6.4 Page Galerie . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16 
+6.5 Page Catalogues . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 1  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+6.6 Page Contact . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17 7. Spécifications 
+des pages dédiées par filiale 18 7.1 Structure type d'une page filiale . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . 18 7.2 Page MACOF Immobilier — Spécificités . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+18 7.3 Page MACOF Restauration — Spécificités . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18 7.4 Page 
+MACOF Print & Com — Spécificités . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19 7.5 Page MACOF Mining 
+— Spécificités . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19 7.6 Page MACOF Transit — Spécificités . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19 7.7 Page MACOF Fishing — Spécificités . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . 19 8. Module Formulaire de commande / demande professionnel 21 
+8.1 Types de formulaires . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21 8.2 Champs 
+communs à tous les formulaires . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21 8.3 UX et validation . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22 8.4 Triple canal de notification (CRITIQUE) . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22 8.5 Traitement et suivi des demandes . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . 23 8.6 Sécurité et conformité . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. 23 9. Chatbot intelligent intégré 25 9.1 Cas d'usage et fonctionnalités . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . 25 9.2 Scénarios conversationnels . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . 25 9.3 Architecture technique . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26 9.4 
+Personnalité et ton . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26 10. Tableau de bord 
+administrateur (Dashboard) 27 10.1 Authentification et sécurité . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . 27 10.2 Modules du dashboard . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 27 
+10.3 Modifications en temps réel . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 10.4 Traçabilité et 
+journalisation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 2  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+1. Préambule et contexte du projet  
+Le présent cahier de charges a pour objet de définir, de manière exhaustive et structurée, le 
+cadre technique, fonctionnel, graphique et organisationnel de la conception, du développement, 
+de la mise en ligne et de la maintenance de la plateforme web corporate de MACOF Holding.  
+1.1 Présentation du commanditaire  
+MACOF Holding est un groupe de droit guinéen, structuré autour d'une vision ambitieuse : 
+construire, développer et transformer durablement des secteurs stratégiques de l'économie. 
+À travers une organisation moderne et une gouvernance rigoureuse, le groupe incarne « l'art de 
+façonner l'avenir » en créant de la valeur durable pour ses partenaires, ses collaborateurs et la 
+nation. Le groupe est implanté à Conakry, en République de Guinée, et intervient aujourd'hui dans 
+six domaines d'activité stratégiques à travers six filiales spécialisées.  
+Le présent projet est porté par la direction générale de MACOF Holding et vise à doter le groupe 
+d'une plateforme web institutionnelle unique, fédératrice et évolutive, capable de représenter 
+l'ensemble de ses filiales sous une identité visuelle commune tout en valorisant les spécificités de 
+chacune. La maîtrise d'œuvre est confiée à la société EINSOF DIGIT, prestataire de services 
+numériques, en charge de la conception, du développement, du déploiement et de 
+l'accompagnement post-livraison du projet.  
+1.2 Contexte et enjeux stratégiques  
+Dans un environnement économique guinéen en pleine mutation, marqué par une concurrence 
+croissante et une exigence accrue de professionnalisme de la part des partenaires, investisseurs, 
+institutions et clients, la présence digitale d'un groupe diversifié constitue un actif stratégique majeur. 
+MACOF Holding exprime aujourd'hui le besoin de disposer d'une plateforme web moderne, 
+structurée et performante, à la hauteur de son ambition : devenir un groupe de référence reconnu 
+pour son excellence, sa performance durable et sa contribution au développement économique 
+national.  
+Les enjeux principaux identifiés sont les suivants :  
+● Image de marque : présenter une vitrine corporate cohérente reflétant la stature holding du 
+groupe et la diversité de ses filiales.  
+● Génération de leads : capter des demandes qualifiées à travers des formulaires professionnels 
+et un suivi multi-canal des opportunités.  
+● Transparence et crédibilité : fournir une information complète, structurée et à jour sur 
+l'ensemble des domaines d'activité du groupe.  
+● Autonomie opérationnelle : permettre à l'administrateur du groupe de mettre à jour le contenu 
+du site en temps réel sans dépendance technique permanente au prestataire.  
+● Accessibilité multi-device : garantir une expérience utilisateur fluide sur ordinateur, tablette et 
+mobile, y compris dans des conditions de connectivité variables. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 3  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Évolutivité : concevoir une architecture permettant l'ajout futur de nouvelles filiales, de nouvelles 
+pages, de nouvelles fonctionnalités ou de nouveaux services.  
+1.3 Objet du document  
+Le présent cahier de charges décrit de façon détaillée les spécifications fonctionnelles et techniques 
+du projet. Il constitue le document de référence contractuel entre MACOF Holding (le Client) et 
+EINSOF DIGIT (le Prestataire). Il couvre l'ensemble des pages, modules, intégrations, livrables, 
+phases, conditions techniques et modalités d'exécution du projet. Toute évolution ou modification des 
+spécifications fera l'objet d'un avenant écrit dûment signé par les deux parties. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 4  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+2. Présentation du Client — MACOF HOLDING  
+2.1 Identité du groupe  
+MACOF Holding est un groupe guinéen multi-sectoriel organisé selon un modèle de holding. Sa 
+raison sociale est MACOF HOLDING. Son siège social est situé à Manquepa, en face de Banc Bleu, 
+dans la commune de Kaloum à Conakry, en République de Guinée. Le groupe est joignable via les 
+numéros +224 625 74 46 26 et +224 623 98 75 11, et par courriel à l'adresse 
+macofholding2018@gmail.com. Son slogan institutionnel est « L'art de façonner l'avenir », qui 
+exprime la philosophie du groupe : transformer durablement les secteurs stratégiques de l'économie 
+nationale à travers une approche structurée et professionnelle.  
+2.2 Historique et parcours  
+Le groupe MACOF a connu une trajectoire de croissance organique et de structuration progressive, 
+marquée par trois grandes étapes :  
+1 2018 — Création de MACOF SARL : fondation de l'entreprise en République de Guinée sous la 
+forme d'une Société à Responsabilité Limitée (SARL), marquant le point de départ des activités du 
+groupe.  
+2 2023 — Transformation en MACOF SA : évolution vers une Société Anonyme (SA), 
+traduisant une phase d'expansion et de structuration renforcée, avec une gouvernance 
+formelle et une capacité d'investissement élargie.  
+3 2026 — Transition vers MACOF Holding : adoption d'un modèle de Holding afin d'optimiser 
+la gouvernance, la coordination stratégique et le développement sectoriel du groupe, dans 
+une logique de spécialisation par filiale.  
+2.3 Vision et mission  
+Vision. Devenir un groupe de référence, reconnu pour son excellence, sa performance durable et sa 
+contribution au développement économique de la Guinée et au-delà de la sous-région 
+ouest-africaine.  
+Mission. Structurer, piloter et développer ses filiales à travers une gouvernance rigoureuse, une 
+stratégie claire et une gestion centralisée, afin de garantir une croissance durable et créatrice de 
+valeur pour l'ensemble des parties prenantes — actionnaires, collaborateurs, partenaires, clients et 
+la collectivité nationale.  
+2.4 Organisation en filiales  
+MACOF Holding développe ses activités à travers six filiales expertes dans leurs domaines 
+respectifs, chacune dédiée à un secteur stratégique. Le tableau ci-dessous synthétise l'organisation 
+du groupe : 
+Filiale  
+Secteur d'activité  
+Champ d'intervention 
+MACOF Immobilier 
+SARL  
+Immobilier & BTP  
+Investissement immobilier, promotion, 
+construction, travaux publics, infrastructures 
+ 
+ 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 5  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+Filiale  
+Secteur d'activité  
+Champ d'intervention 
+MACOF Restauration 
+SARL  
+Restauration & Traiteur  
+Restauration premium, collective, 
+événementielle, boulangerie-pâtisserie 
+MACOF Print & Com SARL  
+Communication &  
+Impression 
+Impression, identité visuelle, signalétique, 
+organisation d'événements 
+MACOF Mining SARL  
+Activités minières  
+Exploration, exploitation, sous-traitance, 
+transport et commercialisation de produits 
+miniers 
+MACOF Transit SARL  
+Transit, Logistique &  
+Voyages 
+Dédouanement, transport, logistique, 
+import-export, billetterie 
+MACOF Fishing SARL  
+Pêche & Ressources  
+halieutiques 
+Pêche artisanale et industrielle, 
+transformation, distribution produits de 
+la mer 
+ 
+ 
+Tableau 1 — Organisation sectorielle de MACOF Holding en six filiales 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 6  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+3. Analyse détaillée des domaines d'activité  
+Cette section présente une analyse méticuleuse de chacune des six filiales du groupe MACOF 
+Holding. Pour chaque filiale sont décrits : la nature des activités, les services proposés, les 
+segments de clientèle ciblés, et les enjeux spécifiques à prendre en compte dans la conception 
+de la page web dédiée.  
+3.1 MACOF Immobilier SARL — Immobilier & BTP  
+MACOF Immobilier SARL est la filiale spécialisée dans l'investissement immobilier, la promotion et 
+les travaux publics (BTP). Elle intervient dans la conception, la réalisation et la gestion de projets 
+immobiliers et d'infrastructures structurantes, en Guinée et à l'international. Cette filiale joue un rôle 
+central dans la stratégie du groupe : elle contribue activement au développement urbain et à la 
+modernisation des infrastructures du pays.  
+Activités couvertes :  
+● Acquisition et valorisation de terrains à vocation résidentielle, commerciale, industrielle ou institutionnelle.  
+● Conception et construction de bâtiments résidentiels, commerciaux et administratifs 
+(logements, immeubles, bureaux, complexes commerciaux).  
+● Promotion et commercialisation de biens immobiliers (programmes neufs, lots, lots 
+aménagés). ● Gestion locative et patrimoniale (administration de parc, optimisation des 
+revenus, maintenance). ● Travaux publics et ouvrages d'infrastructures (voirie, réseaux, 
+ouvrages d'art).  
+● Travaux de réhabilitation, d'aménagement et de modernisation urbaine.  
+Enjeux web spécifiques : présentation visuelle des projets réalisés via galerie avant/après, 
+formulaire de demande de devis pour projets BTP, mise en avant des capacités techniques et 
+des certifications, valorisation des références clients institutionnels.  
+3.2 MACOF Restauration SARL — Restauration  
+MACOF Restauration SARL est la filiale spécialisée dans les services de restauration haut de 
+gamme, alliant excellence culinaire, rigueur organisationnelle et standards élevés de qualité. Elle 
+opère à travers trois segments stratégiques complémentaires couvrant l'ensemble du spectre de la 
+restauration professionnelle, de la restauration commerciale grand public à la restauration 
+événementielle de prestige.  
+Segments d'activité :  
+● Restauration commerciale premium : MACOF Restauration développe ses activités à 
+travers LES RESTAURANTS SEBA INTERNATIONAL, un espace moderne dédié à la 
+restauration, à la boulangerie-pâtisserie et aux services traiteur. C'est la vitrine grand 
+public de la filiale. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 7  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Restauration collective structurée : gestion de cantines d'entreprises, d'institutions, de sites 
+industriels et de bases minières, avec des solutions adaptées aux grands volumes et aux 
+environnements exigeants (HSE, sécurité alimentaire, logistique).  
+● Restauration événementielle & service traiteur : organisation de prestations sur mesure pour 
+mariages, conférences, événements institutionnels, cocktails et cérémonies officielles, avec 
+une équipe dédiée à l'événementiel haut de gamme.  
+Enjeux web spécifiques : présentation des menus et services SEBA International, galerie 
+d'événements traités, formulaire de réservation / devis traiteur, mise en avant des 
+certifications HSE et sécurité alimentaire, témoignages clients institutionnels.  
+3.3 MACOF Print & Com SARL — Communication & Impression  
+MACOF Print & Com SARL est la filiale spécialisée dans l'imprimerie professionnelle, la 
+communication visuelle et l'organisation de grands événements. Elle accompagne entreprises, 
+institutions et organisations dans la conception et la valorisation de leur image de marque, à travers 
+une offre intégrée combinant création, production et organisation logistique.  
+Prestations proposées :  
+● Création d'identités visuelles et de supports institutionnels (logos, chartes, papeteries, rapports 
+annuels). ● Impression numérique et offset de haute qualité (petits et grands formats, supports 
+variés).  
+● Production de supports publicitaires et signalétiques (enseignes, banderoles, PLV, 
+signalétique intérieure/extérieure).  
+● Organisation et gestion de grands événements : montage technique, coordination 
+logistique, accompagnement stratégique de manifestations institutionnelles, 
+corporatives et publiques.  
+La filiale se distingue particulièrement par son expertise dans l'organisation d'événements de grande 
+envergure, qui constitue un axe de différenciation concurrentielle fort sur le marché guinéen.  
+Enjeux web spécifiques : portfolio de réalisations graphiques et événementielles, simulateur 
+de devis en ligne, présentation des équipements d'impression, témoignages clients, 
+formulaire de brief projet.  
+3.4 MACOF Mining SARL — Activités minières  
+MACOF Mining SARL est la filiale spécialisée dans les activités minières et la valorisation des 
+ressources naturelles. Elle évolue dans le respect des normes réglementaires et environnementales 
+en vigueur en République de Guinée, avec pour objectif de contribuer au développement durable et 
+structuré du secteur minier, l'un des piliers de l'économie nationale.  
+Périmètre d'intervention : 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 8  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Exploration et exploitation minière (bauxite, or, fer, diamant et autres ressources 
+stratégiques). ● Sous-traitance et appui aux opérations minières (services techniques, 
+logistiques, de sécurité).  
+● Transport et commercialisation de produits miniers (vers les ports d'exportation et les 
+marchés internationaux).  
+Enjeux web spécifiques : présentation des permis et conformités réglementaires, engagements 
+RSE et environnementaux, références de chantiers, formulaire de partenariat / sous-traitance, 
+mise en avant des certifications HSE.  
+3.5 MACOF Transit SARL — Transit, Logistique & Voyages  
+MACOF Transit SARL est la filiale spécialisée dans le transit, la logistique, le transport de 
+marchandises et les services de voyage. Grâce à une organisation structurée et à une parfaite 
+maîtrise des procédures réglementaires guinéennes et sous-régionales, elle facilite les échanges 
+commerciaux et les déplacements internationaux, en garantissant fiabilité, conformité et efficacité.  
+Services proposés :  
+● Dédouanement et formalités administratives (import, export, transits, régimes douaniers 
+spéciaux). ● Transport national et international de marchandises (routier, maritime, aérien).  
+● Gestion logistique et suivi des expéditions (supply chain, entreposage, distribution). ● 
+Assistance aux opérations d'import-export (conseil réglementaire, optimisation des flux). ● Vente 
+de billets d'avion et accompagnement aux voyages (réservation, émission, assistance 
+voyageurs).  
+Enjeux web spécifiques : formulaire de demande de devis transit en ligne, suivi de 
+colis/expéditions, présentation des partenaires logistiques, simulateur de frais de dédouanement, 
+formulaire de réservation de billets.  
+3.6 MACOF Fishing SARL — Pêche & Ressources halieutiques  
+MACOF Fishing SARL est la filiale spécialisée dans les activités halieutiques et la valorisation des 
+ressources maritimes. Elle contribue au développement du secteur de la pêche en garantissant 
+qualité, respect des normes et gestion responsable des ressources, dans une logique de durable et 
+de valorisation locale de la production.  
+Champs d'activité :  
+● Pêche artisanale et industrielle (flotte dédiée, équipements modernes, équipages 
+qualifiés). ● Transformation et conservation des produits halieutiques (frais, congelé, 
+fumé, transformé). ● Commercialisation et distribution des produits de la mer (marché 
+local, restauration, export). 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 9  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Activités liées à l'exploitation durable des ressources marines (pêche responsable, traçabilité).  
+Enjeux web spécifiques : présentation de la chaîne de valeur (pêche → transformation → 
+distribution), catalogue produits, certifications qualité et traçabilité, engagements développement 
+durable, formulaire de commande pour grossistes et distributeurs. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 10  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+4. Objectifs et périmètre du projet web  
+4.1 Objectifs stratégiques  
+La plateforme web de MACOF Holding poursuit une série d'objectifs stratégiques qui guideront 
+l'ensemble des choix de conception, de design et de développement :  
+1 Image corporate unifiée : présenter MACOF Holding comme un groupe intégré et cohérent, 
+avec une identité visuelle forte déclinée sur l'ensemble du site, tout en valorisant les 
+spécificités de chaque filiale.  
+2 Génération et qualification de leads : doter chaque filiale d'un formulaire professionnel 
+permettant aux visiteurs de soumettre des demandes structurées, avec un routage instantané 
+vers les canaux de réception du groupe (Gmail, WhatsApp, dashboard).  
+3 Information transparente et structurée : offrir à chaque visiteur — particulier, entreprise, 
+institution, investisseur — une information complète, hiérarchisée et à jour sur l'ensemble des 
+domaines d'activité du groupe.  
+4 Engagement et conversation : intégrer un chatbot intelligent capable de répondre aux 
+questions courantes, d'orienter les visiteurs vers la filiale concernée et de qualifier les 
+demandes entrantes 24h/24.  
+5 Autonomie de gestion : doter l'administrateur du groupe d'un tableau de bord complet pour 
+mettre à jour le contenu, ajouter des réalisations, publier des catalogues, suivre les demandes 
+reçues et modérer les échanges.  
+6 Référencement et visibilité : optimiser le site pour les moteurs de recherche (SEO on-page) 
+afin d'être facilement trouvé par les partenaires et clients potentiels sur les requêtes 
+stratégiques.  
+7 Évolutivité et pérennité : bâtir une architecture technique modulaire permettant l'ajout futur de 
+filiales, de pages, de fonctionnalités et de langues (notamment l'anglais à terme).  
+4.2 Publics cibles  
+La plateforme s'adresse à plusieurs catégories de publics, aux attentes et aux parcours différenciés : 
+Public cible  
+Attentes principales  
+Parcours privilégié 
+Clients B2B  
+Comprendre l'offre, demander un devis, 
+évaluer la capacité technique 
+Page filiale → Formulaire de 
+demande → WhatsApp/Email 
+Clients B2C  
+Découvrir les services grand public  
+(restauration, transit, voyages) 
+Accueil → Page filiale →  
+Contact/Réservation 
+Investisseurs &  
+financiers 
+Évaluer la solidité du groupe, la 
+diversification, la gouvernance 
+Accueil → À propos → 
+Filiales → Contact 
+investisseur 
+Partenaires &  
+fournisseurs 
+Identifier les opportunités de 
+coopération, sous-traitance 
+Page filiale → Formulaire 
+partenariat 
+ 
+ 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 11  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+Public cible  
+Attentes principales  
+Parcours privilégié 
+Institutions publiques  
+Vérifier la conformité, les 
+références, les engagements RSE 
+À propos → Filiales → Réalisations 
+Candidats à l'emploi  
+Découvrir le groupe, déposer une 
+candidature spontanée 
+À propos → Contact / Carrières 
+Médias & journalistes  
+Accéder à des informations 
+vérifiables, des contacts presse 
+À propos → Contact presse 
+ 
+ 
+Tableau 2 — Cartographie des publics cibles et de leurs parcours  
+4.3 Périmètre fonctionnel  
+Le périmètre fonctionnel du projet couvre l'ensemble des éléments suivants :  
+● Une page d'accueil corporate présentant le groupe de façon globale.  
+● Une page « À propos » retraçant l'historique, la vision, la mission et 
+l'organisation. ● Une page « Domaines » présentant de façon synthétique les 
+six filiales.  
+● Six pages dédiées (une par filiale) avec un niveau de détail élevé.  
+● Une page « Galerie » présentant les réalisations du groupe sous forme visuelle. ● Une page « 
+Catalogues » permettant le téléchargement de documents (plaquettes, catalogues, fiches). ● 
+Une page « Contact » centralisant les coordonnées et canaux de communication. ● Un 
+formulaire professionnel de commande / demande multi-canal (Gmail + WhatsApp + 
+Dashboard). ● Un chatbot intelligent intégré au site pour le renseignement des visiteurs.  
+● Un tableau de bord administrateur pour la gestion autonome du contenu.  
+● Un pack d'hébergement (nom de domaine + hébergement + 2 adresses mails professionnelles).  
+4.4 Hors-périmètre  
+Sont explicitement exclus du périmètre du présent projet (mais pourront faire l'objet 
+d'avenants) : ● La création d'un portail e-commerce avec paiement en ligne intégré.  
+● Le développement d'applications mobiles natives iOS / Android (une PWA responsive sera 
+fournie). ● L'intégration d'un ERP ou d'un CRM métier connecté au dashboard.  
+● La production de contenus marketing (textes, photos, vidéos) autres que ceux fournis par le 
+Client. ● La traduction dans d'autres langues que le français (une architecture multilingue sera 
+cependant préparée). 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 12  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+5. Architecture de l'information et arborescence  
+L'architecture du site est conçue autour d'une navigation claire et intuitive, permettant à chaque 
+type de visiteur d'accéder rapidement à l'information recherchée. Le site s'articule autour de six 
+pages principales et de six sous-pages dédiées aux filiales, soit un total de douze pages 
+structurelles, auxquelles s'ajoutent les pages fonctionnelles (dashboard, mentions légales, etc.).  
+5.1 Arborescence principale  
+Accueil  
+├── À propos  
+│ ├── Historique  
+│ ├── Vision & Mission  
+│ └── Organisation  
+├── Domaines d'activité  
+│ ├── MACOF Immobilier (page dédiée)  
+│ ├── MACOF Restauration (page dédiée)  
+│ ├── MACOF Print & Com (page dédiée)  
+│ ├── MACOF Mining (page dédiée)  
+│ ├── MACOF Transit (page dédiée)  
+│ └── MACOF Fishing (page dédiée)  
+├── Galerie  
+├── Catalogues (téléchargements)  
+├── Contact  
+└── Dashboard administrateur (accès privé)  
+5.2 Principes de navigation  
+La navigation du site repose sur les principes suivants, qui garantissent une expérience utilisateur 
+fluide et cohérente quel que soit le point d'entrée :  
+● Menu principal persistant : présent sur toutes les pages, en haut du site, avec un indicateur 
+visuel de la page active.  
+● Menu mobile adaptatif : burger menu sur petit écran, déroulant avec animation fluide.  
+● Fil d'Ariane : sur toutes les pages internes, indiquant le chemin de navigation (Accueil > 
+Domaines > MACOF Immobilier).  
+● Footer riche : coordonnées complètes, liens vers les filiales, liens vers les catalogues, 
+mentions légales, newsletter.  
+● Appel à l'action visible : bouton « Demander un devis » / « Nous contacter » accessible en 
+permanence (sticky CTA). 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 13  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Liens croisés : chaque page de filiale propose des liens vers les autres filiales et vers 
+la galerie. ● Moteur de recherche : recherche full-text sur tout le site (contenu, 
+catalogues, actualités).  
+5.3 Maillage interne et SEO  
+L'architecture a été pensée pour favoriser un bon maillage interne, essentiel pour le référencement 
+naturel. Chaque page de filiale est accessible en au plus trois clics depuis la page d'accueil. Les 
+pages connexes (galerie, catalogues, contact) sont interconnectées afin de répartir le « jus SEO » 
+sur 
+l'ensemble 
+du 
+site. 
+Les 
+URLs 
+seront 
+propres, 
+lisibles 
+et 
+optimisées 
+(ex. 
+: 
+macof-holding.com/domaines/immobilier). 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 14  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+6. Spécifications fonctionnelles détaillées — Page 
+par page  
+6.1 Page d'accueil  
+La page d'accueil constitue la vitrine principale du groupe. Elle doit donner en quelques secondes 
+une vision claire de ce qu'est MACOF Holding, de la diversité de ses activités et de la stature 
+institutionnelle du groupe. Elle oriente ensuite les visiteurs vers les contenus pertinents en fonction 
+de leur profil.  
+Sections de la page d'accueil :  
+1 Bandeau hero plein écran : visuel institutionnel de qualité, slogan du groupe « L'art de façonner 
+l'avenir », boutons d'appel à l'action (Découvrir le groupe / Nous contacter).  
+2 Présentation synthétique : en 3-4 paragraphes, qui est MACOF Holding, sa vision, sa 
+mission et son organisation en filiales.  
+3 Section « Nos domaines d'activité » : grille de 6 cartes (une par filiale) avec icône, nom, secteur 
+et courte description, cliquables vers les pages dédiées.  
+4 Section « Chiffres clés » : 4 indicateurs marquants (année de création 2018, 6 filiales, nombre 
+de projets réalisés, nombre de collaborateurs).  
+5 Section « Pourquoi nous choisir » : 3-4 arguments différenciants (diversification, gouvernance, 
+expertise sectorielle, ancrage local).  
+6 Section « Réalisations » : 6 visuels de projets phares issus des différentes 
+filiales. 7 Section « Témoignages » : 3 témoignages clients (partenaires, 
+institutions, clients B2B). 8 Section « Actualités » : 3 dernières actualités du groupe 
+(si blog activé).  
+9 Section CTA final : bandeau avec invitation à contacter le groupe.  
+10 Footer complet : coordonnées, liens filiales, liens catalogues, mentions légales, réseaux sociaux.  
+6.2 Page À propos  
+La page À propos raconte l'histoire du groupe, présente sa vision et sa mission, et donne une vision 
+claire de son organisation interne. Elle doit inspirer confiance et crédibilité auprès des partenaires, 
+investisseurs et institutions.  
+Sections de la page À propos :  
+● Présentation générale du groupe : un texte de présentation institutionnelle mettant en 
+perspective la trajectoire de MACOF Holding.  
+● Historique et parcours : timeline visuelle retraçant les trois grandes étapes (2018 SARL, 2023 
+SA, 2026 Holding) avec descriptions et visuels. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 15  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Vision : encadré dédié présentant la vision du groupe (devenir un groupe de 
+référence). ● Mission : encadré dédié présentant la mission (structurer, piloter, 
+développer les filiales).  
+● Valeurs : 4-6 valeurs fortes du groupe (excellence, intégrité, engagement, innovation, 
+responsabilité, esprit d'équipe).  
+● Organisation : organigramme visuel du groupe (Holding + 6 filiales) avec dirigeants et 
+équipes de direction.  
+● Gouvernance : présentation du conseil d'administration, des comités et des processus de 
+décision. ● Engagements RSE : engagements du groupe en matière de responsabilité sociétale et 
+environnementale.  
+6.3 Page Domaines d'activité  
+La page Domaines est la page pivot du site : elle présente de façon synthétique les six filiales du 
+groupe et oriente le visiteur vers la page dédiée de chacune. Elle doit donner une vision cohérente 
+de la diversification du groupe tout en facilitant l'accès au détail.  
+Structure de la page :  
+● En-tête avec titre et introduction courte sur la diversification sectorielle du groupe.  
+● Grille de 6 cartes filiales (2×3 sur desktop, 1×6 sur mobile), chacune avec : logo/icône, nom de 
+la filiale, secteur d'activité, 2 lignes de description, bouton « En savoir plus ».  
+● Pour chaque carte : survol animé révélant un visuel de l'activité.  
+● Section comparative présentant les filiales sous forme de tableau (secteur, cible, services 
+principaux). ● CTA en bas de page : « Discutons de votre projet » → formulaire de contact.  
+6.4 Page Galerie  
+La page Galerie présente les réalisations du groupe sous forme visuelle, organisées par filiale et par 
+type de projet. Elle doit donner un aperçu concret des capacités opérationnelles du groupe à travers 
+des visuels de qualité professionnelle.  
+Fonctionnalités de la Galerie :  
+● Filtres dynamiques par filiale (Immobilier, Restauration, Print & Com, Mining, Transit, 
+Fishing). ● Filtres par type de projet (chantier, événement, impression, pêche, etc.).  
+● Grille masonry responsive avec lazy loading pour optimiser les performances.  
+● Lightbox au clic sur une image : affichage en grand format avec légende 
+détaillée. ● Pour chaque projet : titre, filiale, date, lieu, description courte, galerie 
+de 3-5 visuels. ● Possibilité de partager une réalisation sur les réseaux sociaux.  
+● Mise à jour de la galerie par l'administrateur via le dashboard (ajout/suppression/modification). 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 16  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+6.5 Page Catalogues  
+La page Catalogues centralise l'ensemble des documents téléchargeables du groupe : plaquettes 
+institutionnelles, catalogues de services par filiale, fiches techniques, rapports annuels, conditions 
+générales. Elle offre aux visiteurs un point d'accès unique pour récupérer les documents officiels du 
+groupe.  
+Fonctionnalités de la page Catalogues :  
+● Catégorisation des documents par filiale et par type (plaquette, catalogue, fiche technique, 
+rapport, CGV). ● Pour chaque document : titre, filiale, type, date de mise à jour, taille, format (PDF, 
+DOCX, XLSX). ● Bouton de téléchargement direct, sans inscription préalable.  
+● Formulaire optionnel « Demander un catalogue papier » (avec adresse de 
+livraison). ● Recherche full-text dans les titres et descriptions des documents.  
+● Statistiques de téléchargement consultables dans le dashboard admin.  
+● Mise à jour par l'administrateur : ajout de nouveaux documents, suppression, 
+modification des métadonnées.  
+6.6 Page Contact  
+La page Contact centralise tous les canaux de communication du groupe. Elle doit permettre à tout 
+visiteur de trouver rapidement le bon interlocuteur et le bon canal, et de soumettre une demande 
+structurée qui sera routée instantanément vers les canaux de réception du groupe.  
+Sections de la page Contact :  
+● Coordonnées générales du groupe : adresse, téléphones, email, horaires.  
+● Carte Google Maps interactive localisant le siège social de MACOF Holding à Conakry. ● 
+Blocs de contact par filiale : un responsable de contact par filiale avec téléphone et email 
+direct. ● Formulaire de contact général structuré (nom, email, téléphone, filiale concernée, 
+objet, message). ● Liens vers les réseaux sociaux (Facebook, LinkedIn, Instagram si 
+applicable).  
+● Boutons WhatsApp cliquables (ouverture directe de la conversation WhatsApp 
+Business). ● Section FAQ avec les questions fréquemment posées.  
+● Section « Nous trouver » avec plan d'accès et indications de transport. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 17  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+7. Spécifications des pages dédiées par filiale  
+Chaque filiale dispose d'une page dédiée complète, conçue selon une structure type commune 
+pour assurer la cohérence du site, mais enrichie d'éléments spécifiques au secteur d'activité. 
+Cette section décrit la structure type applicable aux six pages de filiales, puis précise les 
+particularités de chacune.  
+7.1 Structure type d'une page filiale  
+Chaque page de filiale suit une structure type en huit sections, déclinée et adaptée selon les 
+spécificités de chaque activité :  
+1 Bandeau hero : visuel plein écran de l'activité, nom de la filiale, slogan sectoriel, bouton CTA 
+(Demander un devis / Nous contacter).  
+2 Présentation de la filiale : texte de présentation (200-300 mots) décrivant la filiale, son 
+positionnement, ses atouts.  
+3 Services proposés : liste structurée des prestations avec icônes, titres, descriptions courtes. 4 
+Réalisations / Références : galerie de 3-6 visuels de projets ou réalisations emblématiques, avec 
+légendes. 5 Avantages différenciants : 3-4 atouts clés (expertise, certifications, équipe, 
+équipements). 6 Témoignages clients : 2-3 témoignages de clients de la filiale (texte + nom + 
+fonction + logo). 7 Formulaire de demande spécifique : formulaire adapté à la filiale (voir section 
+8). 8 CTA de bas de page : invitation à contacter la filiale ou à découvrir les autres filiales.  
+7.2 Page MACOF Immobilier — Spécificités  
+● Section « Projets en cours » : carte interactive de la Guinée avec localisation des chantiers. ● 
+Section « Types de constructions » : grille de visuels (résidentiel, commercial, administratif, 
+infrastructure).  
+● Formulaire de demande avec champs spécifiques : type de projet, surface, budget estimé, 
+localisation, délai souhaité.  
+● Encart « Certifications & conformités » : présentation des agréments et assurances 
+professionnels. ● Témoignages d'institutions et de promoteurs partenaires.  
+7.3 Page MACOF Restauration — Spécificités  
+● Section « Nos espaces » : présentation des Restaurants SEBA International avec galerie 
+photos. ● Section « Nos menus » : aperçu des menus et specialties (téléchargeable en 
+PDF). ● Section « Restauration collective » : présentation des contrats d'entreprise et sites 
+miniers. ● Section « Traiteur événementiel » : galerie d'événements traités (mariages, 
+conférences, cocktails). 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 18  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Formulaire de réservation / devis traiteur : type d'événement, date, nombre de convives, lieu, 
+budget. ● Encart « Sécurité alimentaire & HSE » : certifications et démarche qualité.  
+7.4 Page MACOF Print & Com — Spécificités  
+● Section « Nos prestations » : grille de services (identité visuelle, impression, signalétique, 
+événementiel). ● Section « Portfolio » : galerie de réalisations graphiques et événementielles 
+filtrable par type. ● Section « Équipements » : présentation du parc machine (offset, numérique 
+grand format, finition). ● Simulateur de devis en ligne : type de support, format, quantité, finition → 
+estimation. ● Formulaire de brief projet : brief client détaillé pour les projets de communication. ● 
+Témoignages clients B2B et institutionnels.  
+7.5 Page MACOF Mining — Spécificités  
+● Section « Nos permis » : carte des zones d'exploration et d'exploitation (sans données 
+sensibles). ● Section « Nos services » : exploration, exploitation, sous-traitance, transport, 
+commercialisation.  
+● Section « Engagements HSE & RSE » : démarche environnementale, sécurité des équipes, 
+contribution locale.  
+● Section « Nos partenaires » : logos des partenaires techniques et institutionnels. ● 
+Formulaire de partenariat / sous-traitance : type de coopération souhaitée, capacités, 
+références. ● Encart « Conformités réglementaires » : agréments miniers, conformités 
+environnementales.  
+7.6 Page MACOF Transit — Spécificités  
+● Section « Nos services » : transit, transport, logistique, import-export, billetterie. ● Section « 
+Suivi d'expéditions » : champ de saisie de numéro de suivi pour clients connectés. ● Simulateur 
+de frais de dédouanement : type de marchandise, valeur, origine, destination → estimation. ● 
+Section « Nos partenaires logistiques » : compagnies maritimes, aériennes, routières. ● 
+Formulaire de demande de devis transit : type d'opération, marchandise, volumes, Incoterm. ● 
+Module de réservation de billets d'avion : ville de départ, destination, dates, nombre de 
+passagers.  
+7.7 Page MACOF Fishing — Spécificités  
+● Section « Chaîne de valeur » : infographie Pêche → Transformation → Distribution. ● Section « 
+Nos produits » : catalogue produits (frais, congelé, fumé, transformé) avec visuels. ● Section « 
+Flotte & équipements » : présentation de la flotte de pêche et des installations de transformation. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 19  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Section « Marchés » : marché local, restauration, export.  
+● Formulaire de commande pour grossistes : type de produit, quantité, fréquence, lieu de livraison. 
+● Encart « Pêche durable » : engagements en matière de traçabilité et de gestion responsable des 
+ressources. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 20  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+8. Module Formulaire de commande / 
+demande professionnel  
+Le module formulaire constitue le cœur de la génération de leads du site. Il doit permettre aux 
+visiteurs — particuliers, entreprises, institutions — de soumettre des demandes structurées, 
+claires et exploitables, dans un cadre professionnel garantissant la transparence et la traçabilité. 
+Le système de triple notification assure une réception multi-canal en temps réel.  
+8.1 Types de formulaires  
+Plusieurs types de formulaires seront mis en place, adaptés aux contextes d'utilisation :  
+Formulaire  
+Emplacement  
+Champs spécifiques 
+Demande de devis 
+Immobilier / BTP 
+Page MACOF  
+Immobilier 
+Type de projet, surface, budget, localisation, 
+délai 
+Réservation / Devis traiteur  
+Page MACOF  
+Restauration 
+Type d'événement, date, convives, lieu, budget 
+Brief projet communication  
+Page MACOF Print &  
+Com 
+Type de prestation, quantité, format, délai, 
+budget 
+Demande de partenariat 
+minier  
+Page MACOF Mining  
+Type de coopération, capacités, références, zone 
+Devis transit / logistique  
+Page MACOF Transit  
+Type d'opération, marchandise, volume, Incoterm 
+Commande produits 
+halieutiques  
+Page MACOF Fishing  
+Type de produit, quantité, fréquence, livraison 
+Contact général  
+Page Contact + footer  
+Filiale concernée, objet, message 
+ 
+ 
+Tableau 3 — Typologie des formulaires par filiale et par contexte  
+8.2 Champs communs à tous les formulaires  
+Tous les formulaires partagent un socle commun de champs obligatoires, garantissant la qualité et 
+l'exploitabilité des demandes reçues :  
+● Civilité (Monsieur / Madame / Société) — boutons radio.  
+● Nom complet* — champ texte.  
+● Email professionnel* — champ email avec validation de format.  
+● Téléphone* — champ téléphone avec indicatif pays (+224 par défaut).  
+● Société / Organisation — champ texte optionnel.  
+● Fonction — champ texte optionnel. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 21  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Filiale concernée* — liste déroulante (6 filiales + « Demande générale »).  
+● Objet de la demande* — champ texte court.  
+● Message détaillé* — zone de texte multi-lignes.  
+● Pièce jointe — champ d'upload optionnel (PDF, JPG, PNG, max 5 Mo).  
+● Consentement RGPD* — case à cocher obligatoire (acceptation de la politique de 
+confidentialité). ● Bouton « Soumettre ma demande » — call to action visible et animé.  
+8.3 UX et validation  
+L'expérience utilisateur du formulaire est soignée pour maximiser le taux de conversion tout en 
+garantissant la qualité des données collectées :  
+● Validation en temps réel : chaque champ est validé à la saisie (format email, téléphone, 
+champs obligatoires).  
+● Messages d'erreur clairs : en rouge sous le champ concerné, avec indication de l'erreur. ● 
+Indicateur de progression : pour les formulaires longs, barre de progression indiquant 
+l'avancement.  
+● Champs conditionnels : affichage de champs supplémentaires selon les réponses 
+précédentes (ex. : si « Événement » = « Mariage », afficher « Nombre d'invités » et « Date du 
+mariage »).  
+● Auto-save brouillon : sauvegarde automatique des données saisies en localStorage 
+(en cas de rafraîchissement accidentel).  
+● Message de confirmation : après envoi, page de remerciement avec numéro de demande 
+et délai de réponse estimé.  
+● Email de confirmation : envoi automatique d'un email au demandeur confirmant la bonne 
+réception de sa demande.  
+● Protection anti-spam : captcha invisible (Google reCAPTCHA v3) + honeypot pour bloquer les bots.  
+8.4 Triple canal de notification (CRITIQUE)  
+À chaque soumission de formulaire, les informations collectées sont transmises simultanément et 
+en temps réel sur trois canaux distincts, garantissant qu'aucune demande ne soit perdue et que 
+l'entreprise puisse réagir dans les meilleurs délais : 
+Canal  
+Format de notification  
+Délai  
+Destinataire 
+Gmail (Email)  
+Email HTML structuré avec tous les 
+champs du formulaire + pièce jointe 
+< 30  
+seconde
+s 
+Adresse Gmail de 
+réception configurée 
+par MACOF  
+Holding 
+WhatsApp  
+Business 
+Message WhatsApp formaté avec 
+résumé des informations clés + lien 
+vers le détail 
+< 1  
+minute 
+Numéro WhatsApp  
+Business du groupe 
+/ de la filiale 
+concernée 
+ 
+ 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 22  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+Canal  
+Format de notification  
+Délai  
+Destinataire 
+Dashboard  
+administrateur 
+Nouvelle entrée dans le module « 
+Demandes reçues » du dashboard, avec 
+statut « Nouveau » 
+Temps  
+réel 
+Compte administrateur  
+connecté au dashboard 
+ 
+ 
+Tableau 4 — Triple canal de notification des formulaires  
+Architecture technique du triple canal : À la soumission du formulaire, le serveur web 
+déclenche en parallèle trois actions : (1) envoi d'un email via SMTP Gmail (ou API Gmail) à 
+l'adresse configurée, (2) envoi d'un message WhatsApp via l'API WhatsApp Business (ou via un 
+service tiers type Twilio), (3) insertion d'un enregistrement dans la base de données du 
+dashboard admin. En cas d'échec d'un canal, les autres canaux restent opérationnels. Un 
+journal d'envoi (log) permettra de tracer chaque notification.  
+8.5 Traitement et suivi des demandes  
+Le tableau de bord administrateur offre un module dédié à la gestion des 
+demandes reçues : ● Liste de toutes les demandes avec filtres (filiale, date, statut, 
+mot-clé).  
+● Statuts possibles : Nouveau, En cours de traitement, Traité, Archivé, Rejeté.  
+● Vue détaillée de chaque demande avec tous les champs et pièces jointes.  
+● Possibilité d'ajouter des notes internes et d'attribuer la demande à un 
+collaborateur. ● Historique des actions (changement de statut, notes ajoutées, 
+responses envoyées). ● Statistiques : nombre de demandes par filiale, par 
+mois, délai moyen de traitement. ● Export CSV / Excel pour reporting externe.  
+8.6 Sécurité et conformité  
+La gestion des données collectées via les formulaires respecte les principes de protection des 
+données personnelles, dans une logique de conformité aux bonnes pratiques internationales 
+(RGPD-like), adaptée au contexte guinééen :  
+● Chiffrement HTTPS (TLS 1.3) sur tout le site, avec certificat SSL valide.  
+● Stockage chiffré des données sensibles dans la base de données du dashboard.  
+● Politique de confidentialité accessible depuis chaque formulaire (lien).  
+● Consentement explicite obligatoire pour le traitement des données.  
+● Droit à l'accès, à la rectification et à l'effacement (formulaire dédié).  
+● Conservation des données limitée à 36 mois (paramétrable), avec suppression 
+automatique. ● Journalisation des accès au dashboard (qui a consulté quelle 
+demande, quand). 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 23  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+● Sauvegardes chiffrées quotidiennes de la base de données. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 24  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+9. Chatbot intelligent intégré  
+Le site intégrera un chatbot intelligent accessible en permanence (bulle flottante en bas à droite 
+de l'écran), permettant aux visiteurs de poser des questions, d'obtenir des informations sur le 
+groupe et ses filiales, d'être orientés vers la bonne ressource, et de déposer des demandes 
+même en dehors des heures de présence de l'équipe.  
+9.1 Cas d'usage et fonctionnalités  
+Le chatbot couvre les cas d'usage suivants, structurés autour des besoins réels des visiteurs :  
+● FAQ dynamique : réponses aux questions fréquentes (horaires, localisation, services, tarifs 
+indicatifs, modalités de contact).  
+● Orientation filiale : à partir d'une description libre de la demande, le chatbot propose la filiale 
+la plus pertinente.  
+● Présentation des services : description synthétique de chaque filiale et de ses 
+prestations. ● Aide à la navigation : redirection vers la page pertinente (catalogue, 
+galerie, formulaire).  
+● Prise de rendez-vous : proposition de créneaux disponibles pour un appel ou une visite 
+(synchronisation agenda).  
+● Qualification de lead : à la fin de la conversation, le chatbot propose de pré-remplir un formulaire 
+avec les informations collectées.  
+● Transfert humain : possibilité de demander à parler à un conseiller (transfert vers WhatsApp ou email).  
+● Multilingue : le chatbot sera en français à la mise en service, avec architecture permettant 
+l'ajout de l'anglais.  
+9.2 Scénarios conversationnels  
+Plusieurs scénarios conversationnels seront pré configurés pour guider le visiteur selon son 
+intention. Voici les principaux scénarios : 
+Scénario  
+Déclencheur  
+Parcours type 
+Demande de devis  
+« Je veux un devis », « 
+combien ça coûte » 
+Quel service ? → Quelle filiale ? → Détails → 
+Redirection formulaire 
+Recherche  
+d'information 
+« Quels services 
+proposez-vous ? » 
+Présentation synthétique du groupe → 
+Proposition d'explorer les filiales 
+Localisation &  
+horaires 
+« Où êtes-vous ? », « 
+horaires »  
+Adresse + carte + horaires + lien Google Maps 
+Prise de contact  
+« Je veux parler à quelqu'un 
+»  
+WhatsApp Business → Email → Formulaire de 
+contact 
+ 
+ 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 25  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+Scénario  
+Déclencheur  
+Parcours type 
+Suivi de demande  
+« Où en est ma demande ? 
+»  
+Demande du numéro de demande → Statut (si 
+disponible) 
+Candidature  
+spontanée 
+« recrutement », « emploi »  
+Redirection vers email RH ou formulaire dédié 
+ 
+ 
+Tableau 5 — Scénarios conversationnels principaux du chatbot  
+9.3 Architecture technique  
+Le chatbot reposera sur une architecture moderne combinant règles métier (pour les scénarios 
+déterministes) et IA conversationnelle (pour le traitement du langage naturel) :  
+● Moteur conversationnel : solution NLU (type Dialogflow, Rasa ou équivalent) pour la 
+reconnaissance des intentions.  
+● Base de connaissances : FAQ structurée et descriptions des services, alimentée depuis le dashboard 
+admin.  
+● Interface utilisateur : widget flottant en bas à droite, design responsive, personnalisation aux 
+couleurs MACOF.  
+● Handover humain : bascule vers WhatsApp Business ou email en cas de demande complexe.  
+● Historique des conversations : stockage des conversations dans le dashboard admin pour 
+analyse et amélioration continue.  
+● Analytics : statistiques d'utilisation (nombre de conversations, sujets les plus demandés, 
+taux de résolution).  
+● Mise à jour : l'administrateur pourra enrichir la base de connaissances directement depuis le dashboard.  
+9.4 Personnalité et ton  
+Le chatbot adoptera un ton professionnel, courtois et utile, en cohérence avec l'image institutionnelle 
+de MACOF Holding. Il se présentera comme « l'assistant virtuel de MACOF Holding », proposera 
+une aide proactive sans être intrusif, et saura reconnaître les limites de ses compétences en 
+proposant le transfert vers un conseiller humain lorsque nécessaire. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 26  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+10. Tableau de bord administrateur (Dashboard)  
+Le dashboard administrateur est l'interface privée permettant à l'administrateur du site de gérer 
+l'ensemble du contenu, des demandes et des fonctionnalités du site en temps réel, sans 
+dépendance technique vis-à-vis du prestataire. Il sera accessible via une URL dédiée (ex. : 
+macof-holding.com/admin) avec authentification sécurisée.  
+10.1 Authentification et sécurité  
+● Authentification par identifiant + mot de passe fort (politique de complexité imposée).  
+● Authentification à deux facteurs (2FA) via OTP SMS ou application d'authentification 
+(Google Authenticator).  
+● Gestion des rôles et permissions (administrateur principal, éditeur, contributeur 
+filiale). ● Verrouillage du compte après 5 tentatives échouées (protection 
+brute-force).  
+● Journalisation de toutes les connexions (IP, navigateur, date/heure).  
+● Déconnexion automatique après 30 minutes d'inactivité.  
+● Réinitialisation de mot de passe self-service par email.  
+10.2 Modules du dashboard  
+Le dashboard s'organise autour des modules fonctionnels suivants, accessibles depuis un menu latéral 
+gauche : 
+Module  
+Fonctionnalités  
+Permissions 
+Tableau de bord (vue  
+d'ensemble) 
+Indicateurs clés : visites, demandes reçues,  
+téléchargements, statistiques chatbot 
+Tous les rôles 
+Gestion du contenu  
+Édition des pages (textes, images, sections), 
+gestion du menu, du footer 
+Administrateur, Éditeur 
+Gestion des filiales  
+Édition des 6 pages de filiales (services, 
+réalisations, témoignages) 
+Administrateur, Éditeur 
+Galerie  
+Ajout / modification / suppression de visuels, 
+gestion des catégories 
+Administrateur, Éditeur 
+Catalogues & 
+documents  
+Upload de documents (PDF, DOCX), 
+gestion des catégories, statistiques de 
+téléchargement 
+Administrateur, Éditeur 
+Demandes reçues  
+Liste des formulaires soumis, changement 
+de statut, notes internes, export 
+Administrateur, Éditeur 
+Chatbot  
+Visualisation des conversations, gestion de 
+la FAQ, statistiques d'utilisation 
+Administrateur 
+ 
+ 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 27  
+Cahier de Charges · Site Web MACOF Holding EINSOF DIGIT · ED-CC-MACOF-2026-01  
+Module  
+Fonctionnalités  
+Permissions 
+Utilisateurs &  
+permissions 
+Création de comptes, attribution de rôles, 
+révocation d'accès 
+Administrateur principal 
+Actualités / Blog  
+(optionnel) 
+Rédaction, publication, archivage d'articles  
+Administrateur, Éditeur 
+Réglages du site  
+Coordonnées, réseaux sociaux, SEO 
+global, Google Analytics, intégrations 
+Administrateur 
+Sauvegardes &  
+maintenance 
+Déclenchement manuel de sauvegarde, 
+restauration, journal des mises à jour 
+Administrateur principal 
+ 
+ 
+Tableau 6 — Modules fonctionnels du dashboard administrateur  
+10.3 Modifications en temps réel  
+Toute modification effectuée via le dashboard est appliquée en temps réel sur le site public, sans 
+nécessiter de redémarrage ou de déploiement. Le système utilise un mécanisme de cache intelligent 
+qui invalide automatiquement les pages concernées lors d'une modification. L'administrateur dispose 
+d'un éditeur visuel (WYSIWYG) pour la mise en forme du contenu, ainsi que d'un aperçu avant 
+publication pour vérifier le rendu sur desktop et mobile.  
+10.4 Traçabilité et journalisation  
+Chaque action effectuée dans le dashboard est journalisée : qui a fait quoi, quand, depuis quelle 
+adresse IP. Le journal d'activité est consultable par l'administrateur principal et permet de revenir en 
+arrière en cas d'erreur (système de versions avec restauration possible des versions antérieures 
+d'une page). Cette traçabilité est essentielle pour la sécurité, la conformité et la résolution d'incidents.  
+Fin du document. Le présent cahier de charges constitue la version 1.0 du référentiel du 
+projet. Toute modification fera l'objet d'un avenant écrit dûment signé par les deux parties. 
+Document confidentiel · MACOF Holding × EINSOF DIGIT Page 28  
