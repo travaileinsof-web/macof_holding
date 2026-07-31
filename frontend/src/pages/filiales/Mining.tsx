@@ -15,7 +15,7 @@ const fallbackContent: Record<string, string> = {
   hero_title: 'MACOF Mining',
   hero_subtitle: "Domaine d'Excellence 04",
   hero_desc: "Extraction, logistique et exploitation minière responsable. Un acteur majeur en République de Guinée.",
-  hero_bg: 'https://images.unsplash.com/photo-1578507065211-1c4e99a5fd24?q=80&w=2070&auto=format&fit=crop',
+  hero_bg: '/plaquette-mining.jpeg',
   vision_title: 'Notre Vision',
   vision_text_1: "MACOF Mining intervient dans l'exploration et l'exploitation des ressources minérales avec une rigueur opérationnelle absolue.",
   vision_text_2: "Nous opérons principalement sur des gisements de bauxite, d'or et de fer, en garantissant un équilibre parfait entre rentabilité économique, respect de l'environnement et développement des communautés locales.",

@@ -21,14 +21,17 @@ export default function About() {
       } catch (error) {
         console.error("Failed to load page content", error);
         setContent({
-          title_small: 'À Propos de MACOF',
-          title_main: "Une histoire d'<span class=\"italic text-red-500 font-light\">excellence</span>",
-          desc: "Depuis 2018, MACOF Holding s'impose comme un acteur majeur de la transformation économique, en alliant vision stratégique et ancrage local.",
-          mission_title: "Notre Mission",
-          mission_text: "Développer des solutions innovantes et durables dans nos 6 secteurs d'activité, tout en créant de la valeur pour nos partenaires, nos employés et la société guinéenne.",
-          vision_title: "Notre Vision",
-          vision_text: "Devenir le leader incontesté et la référence de l'excellence opérationnelle en Afrique de l'Ouest, en bâtissant un conglomérat résilient et tourné vers l'avenir.",
-          values_title: "Nos Valeurs"
+          hero_title: "MACOF <span class=\"italic text-gradient-corporate\">Holding</span>",
+          hero_desc: "MACOF Holding est un groupe de droit guinéen, structuré autour d'une vision ambitieuse : construire, développer et transformer durablement des secteurs stratégiques de l'économie. À travers une organisation moderne et une gouvernance rigoureuse, le groupe incarne « l'art de façonner l'avenir » en créant de la valeur durable pour ses partenaires, ses collaborateurs et la nation.",
+          vision_text: "Devenir un groupe de référence, reconnu pour son excellence, sa performance durable et sa contribution au développement économique de la Guinée et au-delà de la sous-région ouest-africaine.",
+          mission_text: "Structurer, piloter et développer ses filiales à travers une gouvernance rigoureuse, une stratégie claire et une gestion centralisée, afin de garantir une croissance durable et créatrice de valeur pour l'ensemble des parties prenantes — actionnaires, collaborateurs, partenaires, clients et la collectivité nationale.",
+          valeurs_text: "Excellence - Viser l'excellence dans tout ce que nous entreprenons\nInnovation - Innover en permanence pour rester à la pointe\nIntégrité - Opérer avec transparence et respect de nos engagements\nEngagement - S'engager envers nos clients, partenaires et communauté\nResponsabilité - Contribuer au développement durable\nEsprit d'équipe - Travailler ensemble pour atteindre l'excellence collective",
+          historique_2018: "Fondation de MACOF SARL sous la forme d'une Société à Responsabilité Limitée (SARL) en République de Guinée, marquant le point de départ des activités du groupe.",
+          historique_2023: "Évolution vers une Société Anonyme (SA), traduisant une phase d'expansion et de structuration renforcée, avec une gouvernance formelle et une capacité d'investissement élargie.",
+          historique_2026: "Adoption d'un modèle de Holding afin d'optimiser la gouvernance, la coordination stratégique et le développement sectoriel du groupe, dans une logique de spécialisation par filiale.",
+          org_text_1: "MACOF Holding développe ses activités à travers six filiales expertes dans leurs domaines respectifs, chacune dédiée à un secteur stratégique de l'économie guinéenne : Immobilier & BTP, Restauration & Traiteur, Communication & Impression, Activités minières, Transit & Logistique, et Pêche & Ressources halieutiques.",
+          org_text_2: "La structure holding permet une coordination stratégique efficace tout en offrant à chaque filiale l'autonomie nécessaire pour exceller dans son domaine d'expertise spécifique.",
+          hero_img: "/plaquette-building.jpeg"
         });
       }
     };
@@ -103,7 +106,7 @@ export default function About() {
 
             <div className="relative">
               <img 
-                src={content.hero_img || "https://images.unsplash.com/photo-1572025442646-866d16c84a54?q=80&w=1000&auto=format&fit=crop"} 
+                src={content.hero_img || "/plaquette-building.jpeg"}
                 alt="Gouvernance" 
                 className="w-full h-full object-cover filter grayscale-[20%]"
               />

@@ -15,7 +15,7 @@ const fallbackContent: Record<string, string> = {
   hero_title: 'MACOF Fishing',
   hero_subtitle: "Domaine d'Excellence 06",
   hero_desc: "Exploitation halieutique durable. De la capture hauturière à l'exportation internationale, dans le plus strict respect des écosystèmes.",
-  hero_bg: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=2070&auto=format&fit=crop',
+  hero_bg: '/plaquette-fishing.jpeg',
   vision_title: 'Notre Vocation',
   vision_text_1: "MACOF Fishing valorise les ressources halieutiques guinéennes dans le respect strict des quotas et des écosystèmes marins.",
   vision_text_2: "Notre flotte moderne et nos usines de traitement intégrées nous permettent de garantir une fraîcheur absolue et de répondre aux exigences des marchés internationaux les plus stricts.",

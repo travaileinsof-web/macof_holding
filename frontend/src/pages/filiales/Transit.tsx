@@ -15,7 +15,7 @@ const fallbackContent: Record<string, string> = {
   hero_title: 'MACOF Transit & Logistique',
   hero_subtitle: "Domaine d'Excellence 05",
   hero_desc: "La maîtrise globale de votre Supply Chain. Fluidité, sécurité et conformité douanière absolue.",
-  hero_bg: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop',
+  hero_bg: '/plaquette-logistics.jpeg',
   vision_title: 'Notre Vocation',
   vision_text_1: "MACOF Transit garantit le franchissement transparent et rapide des frontières pour vos marchandises à travers le monde.",
   vision_text_2: "De l'organisation du fret à la livraison sur site, nous maîtrisons chaque maillon de la chaîne logistique avec une expertise reconnue par les douanes guinéennes.",

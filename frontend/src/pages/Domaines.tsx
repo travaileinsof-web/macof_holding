@@ -10,22 +10,22 @@ gsap.registerPlugin(ScrollTrigger);
 
 const FALLBACK_DOMAINES = [
   {
-    id: '01', title: "MACOF Immobilier", subtitle: "Immobilier & BTP", desc: "Investissement immobilier, promotion, construction, travaux publics, infrastructures.", details: ["Promotion", "Construction", "Infrastructures"], link: "/immobilier", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop"
+    id: '01', title: "MACOF Immobilier", subtitle: "Immobilier & BTP", desc: "Investissement immobilier, promotion, construction, travaux publics, infrastructures.", details: ["Promotion immobilière", "Construction", "Travaux publics", "Gestion locative"], link: "/immobilier", img: "/plaquette-construction.jpeg"
   },
   {
-    id: '02', title: "MACOF Restauration", subtitle: "Restauration & Traiteur", desc: "Restauration premium, collective, événementielle, boulangerie-pâtisserie.", details: ["Premium", "Collective", "Traiteur"], link: "/restauration", img: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1000&auto=format&fit=crop"
+    id: '02', title: "MACOF Restauration", subtitle: "Restauration & Traiteur", desc: "Restauration premium, collective, événementielle, boulangerie-pâtisserie à travers les Restaurants SEBA International.", details: ["Restauration premium", "Restauration collective", "Service traiteur", "Boulangerie-pâtisserie"], link: "/restauration", img: "/plaquette-resto.jpeg"
   },
   {
-    id: '03', title: "MACOF Print & Com", subtitle: "Communication & Impression", desc: "Impression, identité visuelle, signalétique, organisation d'événements.", details: ["Impression", "Identité Visuelle", "Événementiel"], link: "/print", img: "https://images.unsplash.com/photo-1562664377-709f2c337eb2?q=80&w=1000&auto=format&fit=crop"
+    id: '03', title: "MACOF Print & Com", subtitle: "Communication & Impression", desc: "Impression, identité visuelle, signalétique, organisation de grands événements.", details: ["Impression offset & numérique", "Identité visuelle", "Signalétique", "Événementiel"], link: "/print", img: "/plaquette-print.jpeg"
   },
   {
-    id: '04', title: "MACOF Mining", subtitle: "Activités minières", desc: "Exploration, exploitation, sous-traitance, transport et commercialisation de produits miniers.", details: ["Exploration", "Exploitation", "Commercialisation"], link: "/mining", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop"
+    id: '04', title: "MACOF Mining", subtitle: "Activités minières", desc: "Exploration, exploitation, sous-traitance, transport et commercialisation de produits miniers.", details: ["Exploration minière", "Exploitation", "Sous-traitance", "Transport minier"], link: "/mining", img: "/plaquette-mining.jpeg"
   },
   {
-    id: '05', title: "MACOF Transit", subtitle: "Transit, Logistique & Voyages", desc: "Dédouanement, transport, logistique, import-export, billetterie.", details: ["Dédouanement", "Fret", "Billetterie"], link: "/transit", img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop"
+    id: '05', title: "MACOF Transit", subtitle: "Transit, Logistique & Voyages", desc: "Dédouanement, transport national et international, logistique, import-export, billetterie.", details: ["Dédouanement", "Fret maritime & aérien", "Logistique", "Billetterie voyage"], link: "/transit", img: "/plaquette-logistics.jpeg"
   },
   {
-    id: '06', title: "MACOF Fishing", subtitle: "Pêche & Ressources", desc: "Pêche artisanale et industrielle, transformation, distribution produits de la mer.", details: ["Pêche", "Transformation", "Distribution"], link: "/fishing", img: "https://images.unsplash.com/photo-1498654077810-12c21d4d6dc3?q=80&w=1000&auto=format&fit=crop"
+    id: '06', title: "MACOF Fishing", subtitle: "Pêche & Ressources", desc: "Pêche artisanale et industrielle, transformation, conservation et distribution de produits de la mer.", details: ["Pêche artisanale & industrielle", "Transformation & conservation", "Commercialisation", "Export"], link: "/fishing", img: "/plaquette-fishing.jpeg"
   }
 ];
 
@@ -65,7 +65,7 @@ export default function Domaines() {
                 desc: f.description,
                 details: parsedDetails,
                 link: routeMap[f.nom] || '/domaines',
-                img: f.image_path ? `${f.image_path}` : "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2000&auto=format&fit=crop"
+                img: f.image_path ? `${f.image_path}` : "/plaquette-building.jpeg"
               };
             });
             setDomaines(formatted);
@@ -135,7 +135,7 @@ export default function Domaines() {
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-blue-950/80 z-10" />
             <img 
-              src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" 
+              src="/plaquette-banner.jpeg"
               alt="Pôles d'expertise" 
               className="w-full h-full object-cover filter grayscale-[30%]" 
             />
@@ -218,7 +218,7 @@ export default function Domaines() {
         {/* CTA Bottom */}
         <section className="py-32 bg-primary relative overflow-hidden">
           <div className="absolute inset-0 z-0 opacity-20">
-             <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2000&auto=format&fit=crop" className="w-full h-full object-cover" alt="Architecture" />
+             <img src="/plaquette-banner.jpeg" className="w-full h-full object-cover" alt="MACOF Holding" />
              <div className="absolute inset-0 bg-primary/80" />
           </div>
           <div className="relative z-10 text-center max-w-4xl mx-auto px-6">

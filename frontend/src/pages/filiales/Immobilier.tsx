@@ -15,7 +15,7 @@ const fallbackContent: Record<string, string> = {
   hero_title: 'MACOF Immobilier',
   hero_subtitle: 'Domaine d\'Excellence 01',
   hero_desc: 'Bâtir l\'avenir avec élégance. Promotion immobilière de prestige, ingénierie de pointe et gestion de biens d\'exception.',
-  hero_bg: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop',
+  hero_bg: '/plaquette-construction.jpeg',
   vision_title: 'Notre Vision',
   vision_text_1: 'Depuis sa création, MACOF Immobilier redéfinit les standards de l\'immobilier de luxe et du BTP en République de Guinée. Nous concevons des espaces de vie uniques qui allient design contemporain, matériaux nobles et intégration environnementale.',
   vision_text_2: 'Que vous recherchiez une résidence principale d\'exception, un écrin pour vos bureaux ou un investissement stratégique, nos architectes et ingénieurs vous accompagnent avec une rigueur absolue de la conception à la remise des clés.',

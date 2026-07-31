@@ -20,12 +20,12 @@ const routeMap: Record<string, string> = {
 };
 
 const FILIALES = [
-  { title: "MACOF Immobilier", subtitle: "Immobilier & BTP", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop", link: "/immobilier" },
-  { title: "MACOF Restauration", subtitle: "Restauration & Traiteur", img: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1000&auto=format&fit=crop", link: "/restauration" },
-  { title: "MACOF Print & Com", subtitle: "Communication & Impression", img: "https://images.unsplash.com/photo-1562664377-709f2c337eb2?q=80&w=1000&auto=format&fit=crop", link: "/print" },
-  { title: "MACOF Mining", subtitle: "Activités minières", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", link: "/mining" },
-  { title: "MACOF Transit", subtitle: "Transit, Logistique & Voyages", img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop", link: "/transit" },
-  { title: "MACOF Fishing", subtitle: "Pêche & Ressources", img: "https://images.unsplash.com/photo-1498654077810-12c21d4d6dc3?q=80&w=1000&auto=format&fit=crop", link: "/fishing" },
+  { title: "MACOF Immobilier", subtitle: "Immobilier & BTP", img: "/plaquette-construction.jpeg", link: "/immobilier" },
+  { title: "MACOF Restauration", subtitle: "Restauration & Traiteur", img: "/plaquette-resto.jpeg", link: "/restauration" },
+  { title: "MACOF Print & Com", subtitle: "Communication & Impression", img: "/plaquette-print.jpeg", link: "/print" },
+  { title: "MACOF Mining", subtitle: "Activités minières", img: "/plaquette-mining.jpeg", link: "/mining" },
+  { title: "MACOF Transit", subtitle: "Transit, Logistique & Voyages", img: "/plaquette-logistics.jpeg", link: "/transit" },
+  { title: "MACOF Fishing", subtitle: "Pêche & Ressources", img: "/plaquette-fishing.jpeg", link: "/fishing" },
 ];
 
 export default function Home() {
@@ -51,7 +51,7 @@ export default function Home() {
             return {
               title: f.nom,
               subtitle: f.secteur || 'Expertise',
-              img: f.image_path || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
+              img: f.image_path || "/plaquette-building.jpeg",
               link: routeMap[f.nom] || '/domaines'
             };
           });
@@ -63,11 +63,11 @@ export default function Home() {
         setContent({
           hero_title_small: 'MACOF Holding',
           hero_title_main: "L'Art de façonner <br/><span class=\"italic text-red-500 font-light\">l'avenir.</span>",
-          hero_desc: "Construire, développer et transformer durablement des secteurs stratégiques de l'économie guinéenne et internationale.",
-          vision_title_small: 'Une Vision Ambitieuse',
-          vision_desc_1: "Chez MACOF Holding, nous ne nous contentons pas de participer à l'économie. Nous sommes des bâtisseurs d'écosystèmes.",
-          vision_desc_2: "Notre mission est d'insuffler l'excellence, l'innovation et la durabilité au cœur de chacun de nos projets, pour créer de la valeur à long terme.",
-          hero_bg: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+          hero_desc: "Groupe guinéen multi-sectoriel, MACOF Holding construit et transforme durablement des secteurs stratégiques de l'économie à travers six filiales spécialisées : Immobilier, Restauration, Communication, Mining, Transit et Pêche.",
+          vision_title_small: 'Notre Vision',
+          vision_desc_1: "MACOF Holding est un groupe de droit guinéen, structuré autour d'une vision ambitieuse : construire, développer et transformer durablement des secteurs stratégiques de l'économie.",
+          vision_desc_2: "À travers une organisation moderne et une gouvernance rigoureuse, le groupe incarne « l'art de façonner l'avenir » en créant de la valeur durable pour ses partenaires, ses collaborateurs et la nation.",
+          hero_bg: "/plaquette-banner.jpeg"
         }); 
         setFiliales(FILIALES);
       }
@@ -85,7 +85,7 @@ export default function Home() {
             return {
               title: f.nom,
               subtitle: f.secteur || 'Expertise',
-              img: f.image_path || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
+              img: f.image_path || "/plaquette-building.jpeg",
               link: routeMap[f.nom] || '/domaines'
             };
           });
@@ -150,7 +150,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-blue-900/60 z-10" />
           <img 
-            src={content.hero_bg || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"} 
+            src={content.hero_bg || "/plaquette-banner.jpeg"}
             alt="MACOF Building" 
             className="hero-bg w-full h-[120%] object-cover object-center -top-[10%]"
           />
@@ -275,12 +275,12 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {(content?.realisations ? JSON.parse(content.realisations) : [
-              { title: "Cité MACOF", category: "Immobilier", image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000&auto=format&fit=crop" },
-              { title: "SEBA International", category: "Restauration", image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1000&auto=format&fit=crop" },
-              { title: "Opérations Minières Boke", category: "Mining", image: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1000&auto=format&fit=crop" },
-              { title: "Réseau d'Affichage Conakry", category: "Print & Com", image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1000&auto=format&fit=crop" },
-              { title: "Logistique Portuaire", category: "Transit", image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop" },
-              { title: "Flotte Côtière", category: "Fishing", image: "https://images.unsplash.com/photo-1522067823526-724bc2f8c512?q=80&w=1000&auto=format&fit=crop" },
+              { title: "Cité MACOF Résidence", category: "Immobilier", image: "/plaquette-construction.jpeg" },
+              { title: "SEBA International", category: "Restauration", image: "/plaquette-resto.jpeg" },
+              { title: "Opérations Minières", category: "Mining", image: "/plaquette-mining.jpeg" },
+              { title: "Impression Offset", category: "Print & Com", image: "/plaquette-print.jpeg" },
+              { title: "Logistique Portuaire", category: "Transit", image: "/plaquette-logistics.jpeg" },
+              { title: "Flotte Côtière", category: "Fishing", image: "/plaquette-fishing.jpeg" },
             ]).map((item: any, idx: number) => (
               <div key={idx} className="group relative overflow-hidden aspect-video reveal-card">
                 <img src={item.image} alt={item.title} className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-700" />
@@ -331,9 +331,9 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {(content?.actualites ? JSON.parse(content.actualites) : [
-              { date: "12 Juin 2026", category: "Institutionnel", title: "MACOF Holding inaugure son nouveau siège à Conakry", image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=600&auto=format&fit=crop" },
-              { date: "05 Juin 2026", category: "Immobilier", title: "Lancement du projet résidentiel haut de gamme 'Les Perles de Kaloum'", image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=600&auto=format&fit=crop" },
-              { date: "28 Mai 2026", category: "Restauration", title: "SEBA International remporte le prix du meilleur traiteur B2B", image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=600&auto=format&fit=crop" },
+              { date: "12 Juin 2026", category: "Institutionnel", title: "MACOF Holding inaugure son nouveau siège à Conakry", image: "/plaquette-building.jpeg" },
+              { date: "05 Juin 2026", category: "Immobilier", title: "Lancement du projet résidentiel haut de gamme 'Les Perles de Kaloum'", image: "/plaquette-construction.jpeg" },
+              { date: "28 Mai 2026", category: "Restauration", title: "SEBA International remporte le prix du meilleur traiteur B2B", image: "/plaquette-resto.jpeg" },
             ]).map((news: any, i: number) => (
               <div key={i} className="group cursor-pointer reveal-card">
                 <div className="overflow-hidden aspect-video mb-6 relative">
@@ -359,7 +359,7 @@ export default function Home() {
           <Link to="/contact">
             <Button variant="luxury" size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-none">Contactez le groupe</Button>
           </Link>
-          <a href="https://wa.me/224620000000" target="_blank" rel="noopener noreferrer"
+          <a href="https://wa.me/224625744626" target="_blank" rel="noopener noreferrer"
              className="inline-flex items-center gap-2 mt-6 px-6 py-3 border border-white/30 text-white rounded hover:bg-white/10 transition-colors">
             <MessageCircle size={20} />
             <span className="text-sm tracking-widest uppercase">WhatsApp</span>

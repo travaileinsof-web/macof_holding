@@ -16,7 +16,7 @@ const fallbackContent: Record<string, string> = {
   hero_title: 'MACOF Print & Com',
   hero_subtitle: "Domaine d'Excellence 03",
   hero_desc: "Communication visuelle & Impression. La valorisation absolue de votre image de marque.",
-  hero_bg: 'https://images.unsplash.com/photo-1562664377-709f2c337eb2?q=80&w=2070&auto=format&fit=crop',
+  hero_bg: '/plaquette-print.jpeg',
   vision_title: 'Notre Mission',
   vision_text_1: "MACOF Print & Com est la filiale experte en imprimerie de précision, communication visuelle grand format et création d'identités institutionnelles fortes.",
   vision_text_2: "Nous accompagnons les grandes entreprises et institutions gouvernementales dans le déploiement de leur stratégie d'image, en garantissant un rendu colorimétrique parfait et des finitions haut de gamme.",

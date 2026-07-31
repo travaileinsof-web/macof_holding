@@ -15,7 +15,7 @@ const fallbackContent: Record<string, string> = {
   hero_title: 'MACOF Restauration',
   hero_subtitle: "Domaine d'Excellence 02",
   hero_desc: "L'art culinaire porté à son paroxysme. Service traiteur, restauration collective et l'excellence SEBA International.",
-  hero_bg: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2070&auto=format&fit=crop',
+  hero_bg: '/plaquette-resto.jpeg',
   vision_title: 'Notre Philosophie',
   vision_text_1: "MACOF Restauration s'impose comme une référence incontournable de la gastronomie et du service traiteur en Guinée. À travers notre marque phare SEBA International, nous offrons une expérience culinaire raffinée et mémorable.",
   vision_text_2: "Nos chefs élaborent des cartes qui allient les saveurs locales authentiques aux standards de la haute gastronomie internationale, garantissant une prestation sur-mesure pour chaque occasion.",
