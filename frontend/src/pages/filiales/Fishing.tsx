@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
@@ -93,7 +94,7 @@ export default function Fishing() {
         <section className="header-section relative h-screen flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-blue-900/40 to-background z-10" />
-            <img src={content?.hero_bg || fallbackContent.hero_bg} alt="Pêche Industrielle en haute mer" className="header-img w-full h-[120%] object-cover -top-[10%] absolute opacity-80" />
+            <img src={getImageUrl(content?.hero_bg || fallbackContent.hero_bg)} alt="Pêche Industrielle en haute mer" className="header-img w-full h-[120%] object-cover -top-[10%] absolute opacity-80" onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} />
           </div>
           <div className="relative z-20 text-center px-4 max-w-5xl mt-20">
             <p className="text-white text-xs uppercase tracking-[0.4em] font-sans mb-6 reveal-up">{content?.hero_subtitle || fallbackContent.hero_subtitle}</p>
@@ -180,7 +181,7 @@ export default function Fishing() {
               ].map((prod, i) => (
                 <div key={i} className="group relative overflow-hidden bg-card border border-white/5">
                   <div className="aspect-square overflow-hidden">
-                    <img src={prod.i} alt={prod.n} className="w-full h-full object-cover filter grayscale-[20%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500" />
+                    <img src={getImageUrl(prod.i)} alt={prod.n} className="w-full h-full object-cover filter grayscale-[20%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500" onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} />
                   </div>
                   <div className="p-4 bg-white/[0.02]">
                     <h4 className="text-lg font-serif text-white">{prod.n}</h4>
@@ -200,8 +201,8 @@ export default function Fishing() {
         <section className="py-32 bg-card relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="reveal-up grid grid-cols-2 gap-4">
-              <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=800&auto=format&fit=crop" alt="Flotte de Pêche" className="w-full h-64 object-cover filter grayscale-[20%]" />
-              <img src="https://images.unsplash.com/photo-1621689973873-1004bb152843?q=80&w=800&auto=format&fit=crop" alt="Traitement" className="w-full h-64 object-cover filter grayscale-[20%] mt-8 hidden md:block" />
+              <img src={getImageUrl("https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=800&auto=format&fit=crop")} alt="Flotte de Pêche" className="w-full h-64 object-cover filter grayscale-[20%]" onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} />
+              <img src={getImageUrl("https://images.unsplash.com/photo-1621689973873-1004bb152843?q=80&w=800&auto=format&fit=crop")} alt="Traitement" className="w-full h-64 object-cover filter grayscale-[20%] mt-8 hidden md:block" onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} />
             </div>
             
             <div className="reveal-up">

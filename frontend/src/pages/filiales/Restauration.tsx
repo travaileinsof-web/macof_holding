@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
@@ -106,9 +107,10 @@ export default function Restauration() {
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-blue-900/40 to-background z-10" />
             <img
-              src={content?.hero_bg || fallbackContent.hero_bg}
+              src={getImageUrl(content?.hero_bg || fallbackContent.hero_bg)}
               alt="Restaurant gastronomique de luxe"
               className="header-img w-full h-[120%] object-cover -top-[10%] absolute opacity-80"
+              onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
             />
           </div>
           <div className="relative z-20 text-center px-4 max-w-5xl mt-20">
@@ -138,9 +140,10 @@ export default function Restauration() {
               <div className="order-2 lg:order-1 relative reveal-up">
                 <div className="aspect-[4/5] overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1000&auto=format&fit=crop" 
+                    src={getImageUrl("https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1000&auto=format&fit=crop")}
                     alt="Plat gastronomique" 
                     className="w-full h-full object-cover filter grayscale-[10%]"
+                    onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
                   />
                 </div>
                 <div className="absolute -bottom-10 -right-10 bg-card p-8 border border-white/5 max-w-xs hidden md:block">
@@ -269,9 +272,9 @@ export default function Restauration() {
             <h2 className="text-sm font-sans tracking-[0.3em] text-red-200 uppercase mb-6">Aperçu</h2>
             <h3 className="text-4xl md:text-5xl font-serif text-white mb-16">Galerie Réalisations</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1000&auto=format&fit=crop" alt="Restaurant 1" className="w-full h-80 object-cover hover:opacity-80 transition-opacity" />
-              <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1000&auto=format&fit=crop" alt="Restaurant 2" className="w-full h-80 object-cover hover:opacity-80 transition-opacity" />
-              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1000&auto=format&fit=crop" alt="Restaurant 3" className="w-full h-80 object-cover hover:opacity-80 transition-opacity" />
+              <img src={getImageUrl("https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1000&auto=format&fit=crop")} alt="Restaurant 1" className="w-full h-80 object-cover hover:opacity-80 transition-opacity" onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} />
+              <img src={getImageUrl("https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1000&auto=format&fit=crop")} alt="Restaurant 2" className="w-full h-80 object-cover hover:opacity-80 transition-opacity" onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} />
+              <img src={getImageUrl("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1000&auto=format&fit=crop")} alt="Restaurant 3" className="w-full h-80 object-cover hover:opacity-80 transition-opacity" onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} />
             </div>
           </div>
         </section>
