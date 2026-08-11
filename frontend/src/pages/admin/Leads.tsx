@@ -1,15 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search, RefreshCw, ChevronLeft, ChevronRight, Mail } from 'lucide-react';
-import axios from 'axios';
-
-const api = axios.create();
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import { api } from '../../lib/api';
+import { AdminPage } from '../../components/ui/AdminPage';
 
 interface Lead {
   id: number;
@@ -32,13 +25,11 @@ const statutOptions = [
   { value: 'nouveau', label: 'Nouveau' },
   { value: 'en_cours', label: 'En cours' },
   { value: 'traite', label: 'Traite' },
-  { value: 'rejete', label: 'Rejete' },
+  { value: 'archive', label: 'Archive' },
 ];
 
 export default function Leads() {
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [statutFilter, setStatutFilter] = useState('');
   const [filialeFilter, setFilialeFilter] = useState('');
@@ -46,28 +37,18 @@ export default function Leads() {
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [showDetails, setShowDetails] = useState<Lead | null>(null);
 
-  const fetchLeads = useCallback(async () => {
-    try {
-      const response = await api.get('/api/v1/admin/demandes');
+  const { data: leads = [], isLoading: loading, error, refetch: fetchLeads } = useQuery({
+    queryKey: ['adminLeads'],
+    queryFn: async () => {
+      const response = await api.get('/api/v1/admin/demandes?limit=100');
       if (response.data.success) {
-        setLeads(response.data.data || []);
+        const data = response.data.data;
+        return Array.isArray(data) ? data : (data.items || []);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur de chargement');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchLeads();
-  }, [fetchLeads]);
-
-  // Polling for real-time updates
-  useEffect(() => {
-    const pollInterval = setInterval(fetchLeads, 15000);
-    return () => clearInterval(pollInterval);
-  }, [fetchLeads]);
+      return [];
+    },
+    
+  });
 
   // Extract unique filiales from data
   const filiales = Array.from(new Set(leads.map((l) => l.filiale))).filter(Boolean).sort();
@@ -77,8 +58,8 @@ export default function Leads() {
     const query = search.toLowerCase();
     const matchSearch =
       !search ||
-      lead.nom_complet.toLowerCase().includes(query) ||
-      lead.email.toLowerCase().includes(query) ||
+      (lead.nom_complet || '').toLowerCase().includes(query) ||
+      (lead.email || '').toLowerCase().includes(query) ||
       (lead.reference && lead.reference.toLowerCase().includes(query));
     const matchStatut = !statutFilter || lead.statut === statutFilter;
     const matchFiliale = !filialeFilter || lead.filiale === filialeFilter;
@@ -100,8 +81,8 @@ export default function Leads() {
   const updateStatus = async (id: number, newStatus: string) => {
     setUpdatingId(id);
     try {
-      await api.patch(`/api/v1/admin/demandes/${id}/status`, { statut: newStatus });
-      fetchLeads();
+      await api.patch(`/api/v1/admin/demandes/${id}`, { statut: newStatus });
+      queryClient.invalidateQueries({ queryKey: ['adminLeads'] });
     } catch (err) {
       console.error('Erreur mise a jour:', err);
     } finally {
@@ -120,7 +101,7 @@ export default function Leads() {
       nouveau: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
       en_cours: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
       traite: 'bg-green-500/20 text-green-400 border-green-500/30',
-      rejete: 'bg-red-500/20 text-red-400 border-red-500/30',
+      archive: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
     };
     return map[statut] || 'bg-slate-500/20 text-slate-400 border-slate-500/30';
   };
@@ -130,25 +111,19 @@ export default function Leads() {
       nouveau: 'Nouveau',
       en_cours: 'En cours',
       traite: 'Traite',
-      rejete: 'Rejete',
+      archive: 'Archive',
     };
     return map[statut] || statut;
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 text-[#cda434] animate-spin" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="text-center py-12 text-red-400">{error}</div>;
-  }
 
   return (
-    <div className="space-y-6">
+    <AdminPage loading={loading} className="space-y-6">
+      {error && (
+        <div className="bg-red-900/20 border border-red-500/50 p-4 rounded-lg mb-6">
+          <p className="text-red-400">Erreur de chargement des demandes.</p>
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -242,7 +217,7 @@ export default function Leads() {
                         <option value="nouveau">Nouveau</option>
                         <option value="en_cours">En cours</option>
                         <option value="traite">Traite</option>
-                        <option value="rejete">Rejete</option>
+                        <option value="archive">Archive</option>
                       </select>
                     )}
                   </td>
@@ -379,6 +354,6 @@ export default function Leads() {
           </div>
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }

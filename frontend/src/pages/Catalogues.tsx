@@ -7,9 +7,9 @@ import gsap from 'gsap';
 import axios from 'axios';
 
 const fallbackCatalogues = [
-  { id: 1, titre: 'Catalogue Général MACOF Holding', description: 'Découvrez l\'ensemble de nos services', filiale: 'MACOF Holding', fichier_url: '#' },
-  { id: 2, titre: 'Catalogue Immobilier', description: 'Nos projets immobiliers', filiale: 'MACOF Immobilier', fichier_url: '#' },
-  { id: 3, titre: 'Catalogue Restauration', description: 'Nos offres de restauration', filiale: 'MACOF Restauration', fichier_url: '#' },
+  { id: 1, titre: 'Catalogue Général MACOF Holding', description: 'Découvrez l\'ensemble de nos services', filiale: 'MACOF Holding', file_path: '#' },
+  { id: 2, titre: 'Catalogue Immobilier', description: 'Nos projets immobiliers', filiale: 'MACOF Immobilier', file_path: '#' },
+  { id: 3, titre: 'Catalogue Restauration', description: 'Nos offres de restauration', filiale: 'MACOF Restauration', file_path: '#' },
 ];
 
 export default function Catalogues() {
@@ -25,7 +25,8 @@ export default function Catalogues() {
     axios.get('/api/v1/catalogues')
       .then(res => {
         if (res.data.success) {
-          setDocuments(res.data.data);
+          const data = res.data.data;
+          setDocuments(Array.isArray(data) ? data : (data.items || []));
         }
       })
       .catch(err => {
@@ -66,12 +67,12 @@ export default function Catalogues() {
         telephone: selectedDoc.leadForm?.telephone || '',
         objet: `Demande de catalogue: ${selectedDoc.titre}`,
         message: `Téléchargement du catalogue ${selectedDoc.titre}`,
-        type_demande: 'contact',
+        type_demande: 'information',
         filiale: selectedDoc.filiale || 'MACOF Holding'
       });
       setWhatsappUrl(response.data.data?.whatsapp_url || '');
       setDownloadStatus('success');
-      window.open(selectedDoc.fichier_url || selectedDoc.file_path, '_blank');
+      window.open(selectedDoc.file_path || selectedDoc.fichier_url, '_blank');
     } catch (err) {
       console.error('Erreur téléchargement:', err);
       setDownloadStatus('error');

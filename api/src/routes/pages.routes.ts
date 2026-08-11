@@ -7,6 +7,7 @@ import { success, error } from '../utils/response';
 const pagesRoutes = new Hono();
 
 // GET /api/pages/:slug - Get all content for a page slug (public)
+// Returns a FLAT { section_key: content_value } map for easy consumption by the frontend
 pagesRoutes.get('/:slug', async (c) => {
   const slug = c.req.param('slug');
 
@@ -19,21 +20,13 @@ pagesRoutes.get('/:slug', async (c) => {
     return error(c, 'Page non trouvee', 404);
   }
 
-  // Transform array into key-value object
-  const pageData: Record<string, { value: string; type: string; section: string }> = {};
-  for (const content of contents) {
-    pageData[content.section_key] = {
-      value: content.content_value || '',
-      type: content.content_type,
-      section: content.section_key,
-    };
+  // Build a FLAT key → value map: { hero_title: "...", stats: "[...]", ... }
+  const flat: Record<string, string> = {};
+  for (const row of contents) {
+    flat[row.section_key] = row.content_value || '';
   }
 
-  return success(c, {
-    page_slug: slug,
-    sections: pageData,
-    raw: contents,
-  });
+  return success(c, flat);
 });
 
 // GET /api/pages/:slug/:section - Get specific section content (public)

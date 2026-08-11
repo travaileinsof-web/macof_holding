@@ -9,7 +9,8 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react';
-import axios from 'axios';
+import { api } from '../../lib/api';
+import { AdminPage } from '../../components/ui/AdminPage';
 
 interface PageSection {
   key: string;
@@ -24,18 +25,9 @@ interface PageData {
   sections: PageSection[];
 }
 
-const api = axios.create();
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 const pages: Array<{ label: string; slug: string }> = [
-  { label: 'Accueil', slug: 'accueil' },
-  { label: 'A propos', slug: 'a-propos' },
+  { label: 'Accueil', slug: 'home' },
+  { label: 'A propos', slug: 'about' },
   { label: 'Immobilier', slug: 'immobilier' },
   { label: 'Restauration', slug: 'restauration' },
   { label: 'Transit', slug: 'transit' },
@@ -81,8 +73,8 @@ export default function PagesEditor() {
     }
   }, [notification]);
 
-  const fetchPage = async () => {
-    setLoading(true);
+  const fetchPage = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const res = await api.get(`/api/v1/admin/pages/${selectedPage}`);
       if (res.data.success) {
@@ -110,7 +102,7 @@ export default function PagesEditor() {
     if (!pageData) return;
     setPageData({
       ...pageData,
-      sections: pageData.sections.map((s) => (s.key === key ? { ...s, value } : s)),
+      sections: pageData.sections?.map((s) => (s.key === key ? { ...s, value } : s)),
     });
   };
 
@@ -120,7 +112,7 @@ export default function PagesEditor() {
     const url = URL.createObjectURL(file);
     setPageData({
       ...pageData,
-      sections: pageData.sections.map((s) =>
+      sections: pageData.sections?.map((s) =>
         s.key === key ? { ...s, value: s.value, image_url: url } : s
       ),
     });
@@ -133,7 +125,7 @@ export default function PagesEditor() {
     setSavingKey(key);
 
     try {
-      const section = pageData.sections.find((s) => s.key === key);
+      const section = pageData.sections?.find((s) => s.key === key);
       if (!section) return;
 
       const formData = new FormData();
@@ -145,7 +137,7 @@ export default function PagesEditor() {
 
       await api.post(`/api/v1/admin/pages/${selectedPage}`, formData);
       setNotification({ type: 'success', message: `Section "${toReadableLabel(key)}" sauvegardée.` });
-      fetchPage(); // Refresh to get the real image URL from server
+      fetchPage(true); // Refresh to get the real image URL from server (silent)
     } catch (err) {
       console.error('Erreur sauvegarde:', err);
       setNotification({ type: 'error', message: `Erreur lors de la sauvegarde.` });
@@ -221,7 +213,7 @@ export default function PagesEditor() {
   };
 
   return (
-    <div className="flex gap-6 min-h-[calc(100vh-7rem)]">
+    <AdminPage loading={loading} className="flex gap-6 min-h-[calc(100vh-7rem)]">
       {/* Page Sidebar */}
       <div className="w-64 flex-shrink-0">
         <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Pages</h3>
@@ -273,7 +265,11 @@ export default function PagesEditor() {
             <p className="text-slate-400 text-sm mt-1">Editez les sections de la page.</p>
           </div>
           <button
-            onClick={fetchPage}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              fetchPage();
+            }}
             className="text-slate-400 hover:text-slate-200 transition-colors"
           >
             <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
@@ -285,13 +281,13 @@ export default function PagesEditor() {
           <div className="flex items-center justify-center h-64">
             <RefreshCw className="h-8 w-8 text-[#cda434] animate-spin" />
           </div>
-        ) : !pageData || pageData.sections.length === 0 ? (
+        ) : !pageData?.sections || pageData.sections.length === 0 ? (
           <div className="text-center py-12 text-slate-500">
             <p>Aucune section disponible pour cette page.</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {pageData.sections.map((section) => (
+            {pageData?.sections?.map((section) => (
               <div
                 key={section.key}
                 className="bg-[#1e293b] border border-slate-700 rounded-lg overflow-hidden"
@@ -308,7 +304,11 @@ export default function PagesEditor() {
                   </div>
                   {section.type !== 'image' && (
                     <button
-                      onClick={() => saveSection(section.key)}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        saveSection(section.key);
+                      }}
                       disabled={savingKey === section.key}
                       className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
                     >
@@ -329,6 +329,6 @@ export default function PagesEditor() {
           </div>
         )}
       </div>
-    </div>
+    </AdminPage>
   );
 }

@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState , useMemo } from 'react';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { MessageCircle, Palette, Printer, Presentation, Megaphone } from 'lucide-react';
+import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,6 +43,20 @@ export default function Print() {
   const [reference, setReference] = useState('');
   const [whatsappUrl, setWhatsappUrl] = useState('');
 
+  const { data: filialeData } = useQuery({
+    queryKey: ['filialeData', SLUG],
+    queryFn: async () => {
+      try {
+        const res = await axios.get(`/api/v1/filiales/${SLUG}`);
+        if (res.data.success) return res.data.data;
+      } catch (e) {
+        console.warn('API Error filiale');
+      }
+      return null;
+    },
+    
+  });
+
   const portfolio = [
     { cat: 'Identité', title: 'Rebranding Corporate', img: 'https://images.unsplash.com/photo-1587848135898-d1fcda8352db?q=80&w=800&auto=format&fit=crop' },
     { cat: 'Impression', title: 'Impression Offset HD', img: 'https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=800&auto=format&fit=crop' },
@@ -55,29 +69,26 @@ export default function Print() {
     queryFn: async () => {
       try {
         const res = await axios.get(`/api/v1/pages/${SLUG}`);
-        if (res.data.success && res.data.data) return res.data.data;
+        if (res.data.success && res.data.data) return mergeContent(fallbackContent, res.data.data);
       } catch (err) {
         console.warn('API Error');
       }
-      return null;
+      return fallbackContent;
     },
-    refetchInterval: 30000,
+    
   });
 
-  const { data: realisations = [] } = useQuery({
-    queryKey: ['galerie', 'macof-print'],
-    queryFn: async () => {
+  const realisations = useMemo(() => {
+    if (content?.realisations) {
       try {
-        const res = await axios.get('/api/v1/galerie?filiale=macof-print&limit=8');
-        if (res.data.success) {
-          return Array.isArray(res.data.data) ? res.data.data : (res.data.data?.items || []);
-        }
-      } catch (err) {
-        console.warn('API Error galerie');
+        const parsed = typeof content.realisations === 'string' ? JSON.parse(content.realisations) : content.realisations;
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        console.warn('Error parsing realisations JSON');
       }
-      return [];
-    },
-  });
+    }
+    return [];
+  }, [content?.realisations]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +107,16 @@ export default function Print() {
     }
   };
 
-  const services = content?.services ? JSON.parse(content.services) : fallbackServices;
+  // Force fallbackServices to display the rich text if DB items lack descriptions
+  let services = fallbackServices;
+  if (content?.services) {
+    try {
+      const parsed = JSON.parse(content.services);
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].desc) {
+        services = parsed;
+      }
+    } catch(e) {}
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -322,8 +342,8 @@ export default function Print() {
                 </p>
                 <div className="bg-white p-8 border border-gray-200 shadow-sm">
                   <h4 className="text-xl font-serif text-gray-900 mb-4">Contact Direct Print & Com</h4>
-                  <p className="text-gray-600 font-light text-sm mb-2">Email : {content?.contact_email || fallbackContent.contact_email}</p>
-                  <p className="text-gray-600 font-light text-sm mb-2">Téléphone : {content?.contact_phone || fallbackContent.contact_phone}</p>
+                  <p className="text-gray-600 font-light text-sm mb-2">Email : {filialeData?.email || content?.contact_email || fallbackContent.contact_email}</p>
+                  <p className="text-gray-600 font-light text-sm mb-2">Téléphone : {filialeData?.telephone || content?.contact_phone || fallbackContent.contact_phone}</p>
                   <p className="text-gray-600 font-light text-sm">Adresse : Manquepa, en face de Banc Bleu, Kaloum, Conakry</p>
                 </div>
               </div>

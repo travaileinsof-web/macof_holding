@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Mail, CheckCircle, AlertCircle, Building2, RefreshCw } from 'lucide-react';
-import axios from 'axios';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '../../lib/api';
+import { AdminPage } from '../../components/ui/AdminPage';
 
 interface Demande {
   id: number;
@@ -27,28 +29,19 @@ interface KpiData {
   filialesActives: number;
 }
 
-const api = axios.create();
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 function StatutBadge({ statut, onClick }: { statut: string; onClick?: () => void }) {
   const styles: Record<string, string> = {
     nouveau: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     en_cours: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     traite: 'bg-green-500/20 text-green-400 border-green-500/30',
-    rejete: 'bg-red-500/20 text-red-400 border-red-500/30',
+    archive: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
   };
 
   const labels: Record<string, string> = {
     nouveau: 'Nouveau',
     en_cours: 'En cours',
     traite: 'Traite',
-    rejete: 'Rejete',
+    archive: 'Archive',
   };
 
   return (
@@ -64,52 +57,40 @@ function StatutBadge({ statut, onClick }: { statut: string; onClick?: () => void
 }
 
 export default function Dashboard() {
-  const [demandes, setDemandes] = useState<Demande[]>([]);
-  const [filiales, setFiliales] = useState<Filiale[]>([]);
-  const [kpi, setKpi] = useState<KpiData>({ total: 0, traite: 0, nouveau: 0, filialesActives: 0 });
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
-  const fetchData = useCallback(async () => {
-    try {
-      const [demandesRes, filialesRes] = await Promise.all([
-        api.get('/api/v1/admin/demandes'),
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['dashboardData'],
+    queryFn: async () => {
+      const [demandesRes, filialesRes, statsRes] = await Promise.all([
+        api.get('/api/v1/admin/demandes?limit=100'),
         api.get('/api/v1/admin/filiales'),
+        api.get('/api/v1/admin/stats'),
       ]);
+      return { demandesRes, filialesRes, statsRes };
+    },
+    
+  });
 
-      const demandesData: Demande[] = demandesRes.data.success ? demandesRes.data.data || [] : [];
-      const filialesData: Filiale[] = filialesRes.data.success ? filialesRes.data.data || [] : [];
+  const demandes = data?.demandesRes?.data?.success
+    ? (Array.isArray(data.demandesRes.data.data) ? data.demandesRes.data.data : (data.demandesRes.data.data.items || []))
+    : [];
+  const filiales = data?.filialesRes?.data?.success ? data.filialesRes.data.data || [] : [];
+  const stats = data?.statsRes?.data?.success ? data.statsRes.data.data : null;
 
-      setDemandes(demandesData);
-      setFiliales(filialesData);
-
-      setKpi({
-        total: demandesData.length,
-        traite: demandesData.filter((d) => d.statut === 'traite').length,
-        nouveau: demandesData.filter((d) => d.statut === 'nouveau').length,
-        filialesActives: filialesData.filter((f) => f.statut === 'actif' || f.statut === 'active').length,
-      });
-    } catch (err) {
-      console.error('Erreur fetch dashboard:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  useEffect(() => {
-    const interval = setInterval(fetchData, 15000);
-    return () => clearInterval(interval);
-  }, [fetchData]);
+  const kpi = {
+    total: stats?.total_demandes ?? demandes.length,
+    traite: demandes.filter((d: Demande) => d.statut === 'traite').length,
+    nouveau: stats?.nouvelles_demandes ?? demandes.filter((d: Demande) => d.statut === 'nouveau').length,
+    filialesActives: filiales.filter((f: Filiale) => f.statut === 'actif').length,
+  };
 
   const handleStatusUpdate = async (id: number, newStatus: string) => {
     setUpdatingId(id);
     try {
-      await api.patch(`/api/v1/admin/demandes/${id}/status`, { statut: newStatus });
-      fetchData();
+      await api.patch(`/api/v1/admin/demandes/${id}`, { statut: newStatus });
+      queryClient.invalidateQueries({ queryKey: ['dashboardData'] });
     } catch (err) {
       console.error('Erreur mise a jour statut:', err);
     } finally {
@@ -118,7 +99,7 @@ export default function Dashboard() {
   };
 
   const cycleStatus = (demande: Demande) => {
-    const order = ['nouveau', 'en_cours', 'traite', 'rejete'];
+    const order = ['nouveau', 'en_cours', 'traite', 'archive'];
     const idx = order.indexOf(demande.statut);
     const next = order[(idx + 1) % order.length];
     handleStatusUpdate(demande.id, next);
@@ -137,13 +118,6 @@ export default function Dashboard() {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 10);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 text-[#cda434] animate-spin" />
-      </div>
-    );
-  }
 
   const kpiCards = [
     {
@@ -177,7 +151,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-6">
+    <AdminPage loading={loading} className="space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpiCards.map((card) => {
@@ -204,7 +178,7 @@ export default function Dashboard() {
         <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-200">Demandes recentes</h2>
           <button
-            onClick={fetchData}
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['dashboardData'] })}
             className="text-slate-400 hover:text-slate-200 transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
@@ -254,6 +228,6 @@ export default function Dashboard() {
           </table>
         </div>
       </div>
-    </div>
+    </AdminPage>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
+import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
@@ -16,7 +16,7 @@ const fallbackContent: Record<string, string> = {
   hero_title: 'MACOF Fishing',
   hero_subtitle: "Domaine d'Excellence 06",
   hero_desc: "Exploitation halieutique durable. De la capture hauturière à l'exportation internationale, dans le plus strict respect des écosystèmes.",
-  hero_bg: '/plaquette-fishing.jpeg',
+  hero_bg: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=2070&auto=format&fit=crop',
   vision_title: 'Notre Vocation',
   vision_text_1: "MACOF Fishing valorise les ressources halieutiques guinéennes dans le respect strict des quotas et des écosystèmes marins.",
   vision_text_2: "Notre flotte moderne et nos usines de traitement intégrées nous permettent de garantir une fraîcheur absolue et de répondre aux exigences des marchés internationaux les plus stricts.",
@@ -38,21 +38,30 @@ export default function Fishing() {
   const [formData, setFormData] = useState({ nom_complet: '', email: '', telephone: '', objet: '', message: '' });
   const [reference, setReference] = useState('');
   const [whatsappUrl, setWhatsappUrl] = useState('');
+  const [filialeData, setFilialeData] = useState<any>(null);
 
-  // Fetch page content
+  // Fetch page content and filiale data
   useEffect(() => {
-    axios.get(`/api/v1/pages/${SLUG}`)
-      .then(res => { if (res.data.success) setContent(res.data.data); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      axios.get(`/api/v1/pages/${SLUG}`).catch(() => null),
+      axios.get(`/api/v1/filiales/${SLUG}`).catch(() => null)
+    ]).then(([pagesRes, filialesRes]) => {
+      if (pagesRes?.data?.success) setContent(mergeContent(fallbackContent, pagesRes.data.data));
+      else setContent(fallbackContent);
+      if (filialesRes?.data?.success) setFilialeData(filialesRes.data.data);
+    }).finally(() => setLoading(false));
   }, []);
 
   // Polling every 30s
   useEffect(() => {
     const poll = setInterval(() => {
-      axios.get(`/api/v1/pages/${SLUG}`)
-        .then(res => { if (res.data.success) setContent(res.data.data); })
-        .catch(() => {});
+      Promise.all([
+        axios.get(`/api/v1/pages/${SLUG}`).catch(() => null),
+        axios.get(`/api/v1/filiales/${SLUG}`).catch(() => null)
+      ]).then(([pagesRes, filialesRes]) => {
+        if (pagesRes?.data?.success) setContent(mergeContent(fallbackContent, pagesRes.data.data));
+        if (filialesRes?.data?.success) setFilialeData(filialesRes.data.data);
+      });
     }, 30000);
     return () => clearInterval(poll);
   }, []);
@@ -240,8 +249,8 @@ export default function Fishing() {
                 </p>
                 <div className="bg-white/5 p-8 border border-white/10">
                   <h4 className="text-xl font-serif text-white mb-4">Cellule Commerciale & Export</h4>
-                  <p className="text-blue-200 font-light text-sm mb-2">Email: {content?.contact_email || fallbackContent.contact_email}</p>
-                  <p className="text-blue-200 font-light text-sm">Téléphone: {content?.contact_phone || fallbackContent.contact_phone}</p>
+                  <p className="text-blue-200 font-light text-sm mb-2">Email: {filialeData?.email || content?.contact_email || fallbackContent.contact_email}</p>
+                  <p className="text-blue-200 font-light text-sm">Téléphone: {filialeData?.telephone || content?.contact_phone || fallbackContent.contact_phone}</p>
                 </div>
               </div>
               

@@ -13,12 +13,15 @@ export const authMiddleware = async (c: Context, next: Next) => {
 
   const token = authHeader.substring(7);
 
+  // Only wrap token verification: downstream handler errors must NOT
+  // be swallowed and reported as 401.
   try {
     const payload = await verifyToken(token);
     c.set('user', payload as AuthUser);
-    await next();
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Token invalide ou expire';
     return error(c, message, 401);
   }
+
+  await next();
 };

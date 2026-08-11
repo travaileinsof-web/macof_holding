@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState , useMemo } from 'react';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
+import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useQuery } from '@tanstack/react-query';
@@ -14,15 +14,19 @@ gsap.registerPlugin(ScrollTrigger);
 const SLUG = 'mining';
 
 const fallbackContent: Record<string, string> = {
-  hero_title: 'MACOF Mining',
-  hero_subtitle: "Exploration & Exploitation Minière",
-  hero_desc: "Un acteur industriel majeur engagé dans la valorisation responsable des ressources minières en République de Guinée.",
-  hero_bg: 'https://images.unsplash.com/photo-1516422321453-6bb3a0c7270e?q=80&w=2070&auto=format&fit=crop', // Carrière de mine
-  vision_title: 'Notre Vision Industrielle',
-  vision_text_1: "MACOF Mining SARL est la filiale spécialisée dans l'exploration, l'exploitation et la valorisation des ressources naturelles (bauxite, or, fer, diamant).",
-  vision_text_2: "Nous évoluons dans le strict respect des normes réglementaires et environnementales, avec la ferme conviction que l'industrie minière doit être le moteur d'un développement durable et inclusif.",
-  contact_email: 'macofholding2018@gmail.com',
-  contact_phone: '+224 625 74 46 26',
+  hero_title: 'MACOF Mining SARL',
+  hero_subtitle: 'Département Exploitation',
+  hero_desc: 'Exploration, exploitation et valorisation des ressources minières avec rigueur et responsabilité environnementale.',
+  hero_bg: 'https://images.unsplash.com/photo-1578508493466-231362e92c2f?q=80&w=2070&auto=format&fit=crop',
+  vision_title: 'Notre Vision',
+  vision_text_1: "MACOF Mining SARL opère avec des équipements lourds de pointe pour extraire et valoriser les minerais de manière responsable.",
+  vision_text_2: "Nous mettons un point d'honneur à allier performance industrielle et respect strict des normes environnementales.",
+  stat_1_value: "15+",
+  stat_1_label: "Carrières actives",
+  stat_2_value: "500K",
+  stat_2_label: "Tonnes extraites/an",
+  contact_email: "mining@macof-holding.com",
+  contact_phone: "+224 600 000 000"
 };
 
 const fallbackServices = [
@@ -38,34 +42,45 @@ export default function Mining() {
   const [reference, setReference] = useState('');
   const [whatsappUrl, setWhatsappUrl] = useState('');
 
+  const { data: filialeData } = useQuery({
+    queryKey: ['filialeData', SLUG],
+    queryFn: async () => {
+      try {
+        const res = await axios.get(`/api/v1/filiales/${SLUG}`);
+        if (res.data.success) return res.data.data;
+      } catch (e) {
+        console.warn('API Error filiale');
+      }
+      return null;
+    },
+    
+  });
+
   const { data: content, isLoading: loading } = useQuery({
     queryKey: ['pageContent', SLUG],
     queryFn: async () => {
       try {
         const res = await axios.get(`/api/v1/pages/${SLUG}`);
-        if (res.data.success && res.data.data) return res.data.data;
+        if (res.data.success && res.data.data) return mergeContent(fallbackContent, res.data.data);
       } catch(e) {
         console.warn('API Error');
       }
-      return null;
+      return fallbackContent;
     },
-    refetchInterval: 30000,
+    
   });
 
-  const { data: realisations = [] } = useQuery({
-    queryKey: ['galerie', 'macof-mining'],
-    queryFn: async () => {
+  const realisations = useMemo(() => {
+    if (content?.realisations) {
       try {
-        const res = await axios.get('/api/v1/galerie?filiale=macof-mining&limit=6');
-        if (res.data.success) {
-          return Array.isArray(res.data.data) ? res.data.data : (res.data.data?.items || []);
-        }
-      } catch(e) {
-        console.warn('API Error galerie');
+        const parsed = typeof content.realisations === 'string' ? JSON.parse(content.realisations) : content.realisations;
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        console.warn('Error parsing realisations JSON');
       }
-      return [];
-    },
-  });
+    }
+    return [];
+  }, [content?.realisations]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +99,16 @@ export default function Mining() {
     }
   };
 
-  const services = content?.services ? JSON.parse(content.services) : fallbackServices;
+  // Force fallbackServices to display the rich text if DB items lack descriptions
+  let services = fallbackServices;
+  if (content?.services) {
+    try {
+      const parsed = JSON.parse(content.services);
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].desc) {
+        services = parsed;
+      }
+    } catch(e) {}
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -321,8 +345,8 @@ export default function Mining() {
                 </p>
                 <div className="bg-[#161616] p-8 border border-white/5">
                   <h4 className="text-xl font-serif text-white mb-4">Direction des Opérations Minières</h4>
-                  <p className="text-gray-400 font-light text-sm mb-2">Email : {content?.contact_email || fallbackContent.contact_email}</p>
-                  <p className="text-gray-400 font-light text-sm mb-2">Téléphone : {content?.contact_phone || fallbackContent.contact_phone}</p>
+                  <p className="text-gray-400 font-light text-sm mb-2">Email : {filialeData?.email || content?.contact_email || fallbackContent.contact_email}</p>
+                  <p className="text-gray-400 font-light text-sm mb-2">Téléphone : {filialeData?.telephone || content?.contact_phone || fallbackContent.contact_phone}</p>
                   <p className="text-gray-400 font-light text-sm mt-4 text-[#C4A47C]">Manquepa, Kaloum, République de Guinée</p>
                 </div>
               </div>

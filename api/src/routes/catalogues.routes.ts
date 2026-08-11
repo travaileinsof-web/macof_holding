@@ -36,21 +36,36 @@ cataloguesRoutes.get('/', async (c) => {
     conditions.push(eq(catalogues.type_document, typeFilter as 'catalogue' | 'brochure' | 'plaquette' | 'fiche_technique' | 'autre'));
   }
 
-  const items = await db
-    .select()
+  // JOIN filiales to expose the filiale name alongside the raw id
+  const rows = await db
+    .select({
+      id: catalogues.id,
+      titre: catalogues.titre,
+      filiale: catalogues.filiale,
+      filiale_nom: filiales.nom,
+      type_document: catalogues.type_document,
+      file_path: catalogues.file_path,
+      taille_ko: catalogues.taille_ko,
+      format: catalogues.format,
+      telechargements: catalogues.telechargements,
+      archived: catalogues.archived,
+      created_at: catalogues.created_at,
+      updated_at: catalogues.updated_at,
+    })
     .from(catalogues)
+    .leftJoin(filiales, eq(catalogues.filiale, filiales.id))
     .where(and(...conditions))
     .orderBy(desc(catalogues.created_at))
     .limit(limit)
     .offset(offset);
 
   const [countResult] = await db
-    .select({ count: catalogues.id })
+    .select({ count: sql<number>`count(*)` })
     .from(catalogues)
     .where(and(...conditions));
 
   return success(c, {
-    items,
+    items: rows,
     pagination: {
       page,
       limit,

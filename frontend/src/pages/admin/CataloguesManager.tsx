@@ -9,16 +9,18 @@ import {
   Download,
   FileText,
 } from 'lucide-react';
-import axios from 'axios';
+import { api } from '../../lib/api';
+import { AdminPage } from '../../components/ui/AdminPage';
 
 interface Catalogue {
   id: number;
   titre: string;
-  filiale: string;
+  filiale: number | null;
+  filiale_nom?: string | null;
   type_document: string;
   format: string;
-  taille: string;
-  file_url: string;
+  taille_ko: number | null;
+  file_path: string;
   created_at: string;
 }
 
@@ -27,16 +29,21 @@ interface FilialeOption {
   nom: string;
 }
 
-const api = axios.create();
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-const documentTypes = ['Brochure', 'Devis', 'Catalogue', 'Autre'];
+// Aligned with the backend enum type_document
+const documentTypes = [
+  { value: 'catalogue', label: 'Catalogue' },
+  { value: 'brochure', label: 'Brochure' },
+  { value: 'plaquette', label: 'Plaquette' },
+  { value: 'fiche_technique', label: 'Fiche technique' },
+  { value: 'autre', label: 'Autre' },
+];
+const documentTypeLabels: Record<string, string> = {
+  catalogue: 'Catalogue',
+  brochure: 'Brochure',
+  plaquette: 'Plaquette',
+  fiche_technique: 'Fiche technique',
+  autre: 'Autre',
+};
 
 export default function CataloguesManager() {
   const [catalogues, setCatalogues] = useState<Catalogue[]>([]);
@@ -48,7 +55,7 @@ export default function CataloguesManager() {
 
   const [formTitre, setFormTitre] = useState('');
   const [formFiliale, setFormFiliale] = useState('');
-  const [formType, setFormType] = useState('Catalogue');
+  const [formType, setFormType] = useState('catalogue');
   const [formFile, setFormFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -58,8 +65,14 @@ export default function CataloguesManager() {
         api.get('/api/v1/admin/catalogues'),
         api.get('/api/v1/admin/filiales'),
       ]);
-      if (catRes.data.success) setCatalogues(catRes.data.data || []);
-      if (filialesRes.data.success) setFiliales(filialesRes.data.data || []);
+      if (catRes.data.success) {
+        const cData = catRes.data.data;
+        setCatalogues(Array.isArray(cData) ? cData : (cData.items || []));
+      }
+      if (filialesRes.data.success) {
+        const fData = filialesRes.data.data;
+        setFiliales(Array.isArray(fData) ? fData : (fData.items || []));
+      }
     } catch (err) {
       console.error('Erreur fetch catalogues:', err);
     } finally {
@@ -72,11 +85,12 @@ export default function CataloguesManager() {
   }, [fetchData]);
 
   const filteredCatalogues = catalogues.filter((cat) => {
+    const filialeLabel = cat.filiale_nom || cat.filiale || '';
     return (
       !search ||
-      cat.titre.toLowerCase().includes(search.toLowerCase()) ||
-      cat.filiale.toLowerCase().includes(search.toLowerCase()) ||
-      cat.type_document.toLowerCase().includes(search.toLowerCase())
+      (cat.titre || '').toLowerCase().includes(search.toLowerCase()) ||
+      String(filialeLabel).toLowerCase().includes(search.toLowerCase()) ||
+      (cat.type_document || '').toLowerCase().includes(search.toLowerCase())
     );
   });
 
@@ -90,7 +104,7 @@ export default function CataloguesManager() {
   const openModal = () => {
     setFormTitre('');
     setFormFiliale(filiales[0]?.nom || '');
-    setFormType('Catalogue');
+    setFormType('catalogue');
     setFormFile(null);
     setModalOpen(true);
   };
@@ -126,29 +140,22 @@ export default function CataloguesManager() {
     try {
       await api.delete(`/api/v1/admin/catalogues/${id}`);
       fetchData();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erreur suppression:', err);
+      alert(err?.response?.data?.message || 'Erreur lors de la suppression.');
     }
   };
 
-  const formatFileSize = (size: string) => {
-    if (!size) return '-';
-    const num = parseInt(size, 10);
-    if (isNaN(num)) return size;
-    if (num < 1024) return `${num} o`;
-    if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)} Ko`;
-    return `${(num / (1024 * 1024)).toFixed(1)} Mo`;
+  const formatFileSize = (sizeKo: number | null | undefined) => {
+    if (!sizeKo && sizeKo !== 0) return '-';
+    // taille_ko is in kilobytes
+    if (sizeKo < 1024) return `${sizeKo} Ko`;
+    return `${(sizeKo / 1024).toFixed(1)} Mo`;
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 text-[#cda434] animate-spin" />
-      </div>
-    );
-  }
 
   return (
+    <AdminPage loading={loading}>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -195,19 +202,19 @@ export default function CataloguesManager() {
               {filteredCatalogues.map((cat) => (
                 <tr key={cat.id} className="hover:bg-slate-700/30 transition-colors">
                   <td className="px-6 py-4 text-slate-200 font-medium">{cat.titre}</td>
-                  <td className="px-6 py-4 text-slate-400">{cat.filiale}</td>
+                  <td className="px-6 py-4 text-slate-400">{cat.filiale_nom || cat.filiale || '—'}</td>
                   <td className="px-6 py-4">
                     <span className="inline-block bg-[#cda434]/10 text-[#cda434] rounded-full px-2.5 py-0.5 text-xs font-medium">
-                      {cat.type_document}
+                      {documentTypeLabels[cat.type_document] || cat.type_document}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-400 uppercase text-xs">{cat.format || '-'}</td>
-                  <td className="px-6 py-4 text-slate-400">{formatFileSize(cat.taille)}</td>
+                  <td className="px-6 py-4 text-slate-400">{formatFileSize(cat.taille_ko)}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {cat.file_url && (
+                      {cat.file_path && (
                         <a
-                          href={cat.file_url}
+                          href={cat.file_path}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-amber-500 hover:text-amber-400 text-xs font-medium transition-colors"
@@ -285,8 +292,8 @@ export default function CataloguesManager() {
                   className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors"
                 >
                   {documentTypes.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
+                    <option key={t.value} value={t.value}>
+                      {t.label}
                     </option>
                   ))}
                 </select>
@@ -331,5 +338,6 @@ export default function CataloguesManager() {
         </div>
       )}
     </div>
+    </AdminPage>
   );
 }

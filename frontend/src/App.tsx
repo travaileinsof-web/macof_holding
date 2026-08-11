@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, Outlet, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Lenis from '@studio-freight/lenis';
 import { AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
@@ -31,6 +31,10 @@ import CataloguesManager from './pages/admin/CataloguesManager';
 import FilialesManager from './pages/admin/FilialesManager';
 import PagesEditor from './pages/admin/PagesEditor';
 import Settings from './pages/admin/Settings';
+import StatsManager from './pages/admin/StatsManager';
+import PartenairesManager from './pages/admin/PartenairesManager';
+import TemoignagesManager from './pages/admin/TemoignagesManager';
+import RealisationsManager from './pages/admin/RealisationsManager';
 
 import { AnimatedPage } from './components/layout/AnimatedPage';
 
@@ -42,7 +46,10 @@ ScrollTrigger.defaults({
 });
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('admin_token');
+  // Read token once on mount to avoid premature redirects when the 401
+  // interceptor clears localStorage mid-session (e.g. transient server errors).
+  // The interceptor itself performs the logout navigation via window.location.
+  const [token] = useState(() => localStorage.getItem('admin_token'));
   const location = useLocation();
 
   // Allow access to login page without token
@@ -114,7 +121,11 @@ function AnimatedRoutes() {
   );
 }
 
+import { useRealtimeSync } from './hooks/useRealtimeSync';
+
 function App() {
+  useRealtimeSync();
+
   useEffect(() => {
     // Initialisation du Smooth Scroll (Lenis)
     const lenis = new Lenis({
@@ -158,6 +169,10 @@ function App() {
             <Route path="catalogues" element={<CataloguesManager />} />
             <Route path="filiales" element={<FilialesManager />} />
             <Route path="pages" element={<PagesEditor />} />
+            <Route path="stats" element={<StatsManager />} />
+            <Route path="partenaires" element={<PartenairesManager />} />
+            <Route path="temoignages" element={<TemoignagesManager />} />
+            <Route path="realisations" element={<RealisationsManager />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Route>

@@ -5,110 +5,174 @@ import { Button } from '../components/ui/Button';
 import { Link } from 'react-router-dom';
 import { AnimatedPage } from '../components/layout/AnimatedPage';
 import axios from 'axios';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, CheckCircle, ChevronRight, ShieldCheck } from 'lucide-react';
 import DOMPurify from 'dompurify';
+import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const routeMap: Record<string, string> = {
-  'MACOF Immobilier': '/immobilier',
-  'MACOF Restauration': '/restauration',
-  'MACOF Transit': '/transit',
-  'MACOF Mining': '/mining',
-  'MACOF Fishing': '/fishing',
-  'MACOF Print & Com': '/print',
-};
+// Données ultra-riches (Hardcoded Fallback)
+const MACOF_DATA = {
+  hero_title_small: 'MACOF Holding',
+  hero_title_main: "L'art de façonner <br/><span class=\"italic text-red-600 font-light\">l'avenir.</span>",
+  hero_desc: "MACOF Holding est un groupe de droit guinéen structuré autour d'une vision ambitieuse : construire, développer et transformer durablement des secteurs stratégiques de l'économie. À travers une organisation moderne et une gouvernance rigoureuse, MACOF Holding crée de la valeur durable pour ses partenaires, ses collaborateurs et la nation.",
+  hero_bg: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+  
+  vision_title_small: 'Notre ADN',
+  vision_desc_1: "Une organisation moderne et une gouvernance rigoureuse",
+  vision_desc_2: "En mutualisant nos expertises, nous créons des synergies fortes entre nos différentes filiales pour relever les défis complexes de demain.",
+  
+  filiales: [
+    { title: "MACOF Immobilier SARL", subtitle: "Immobilier & BTP", img: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1000&auto=format&fit=crop", link: "/immobilier" },
+    { title: "SEBA International", subtitle: "Restauration & Gastronomie", img: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1000&auto=format&fit=crop", link: "/restauration" },
+    { title: "MACOF Print & Com SARL", subtitle: "Communication & Design", img: "https://images.unsplash.com/photo-1542744094-3a31f272c490?q=80&w=1000&auto=format&fit=crop", link: "/print" },
+    { title: "MACOF Mining SARL", subtitle: "Industrie Minière", img: "https://images.unsplash.com/photo-1578507005479-7a0808a3d666?q=80&w=2070&auto=format&fit=crop", link: "/mining" },
+    { title: "MACOF Transit SARL", subtitle: "Logistique & Import-Export", img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop", link: "/transit" },
+    { title: "MACOF Fishing SARL", subtitle: "Pêche & Halieutique", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=2070&auto=format&fit=crop", link: "/fishing" }
+  ],
 
-const FILIALES = [
-  { title: "MACOF Immobilier", subtitle: "Immobilier & BTP", img: "/plaquette-construction.jpeg", link: "/immobilier" },
-  { title: "MACOF Restauration", subtitle: "Restauration & Traiteur", img: "/plaquette-resto.jpeg", link: "/restauration" },
-  { title: "MACOF Print & Com", subtitle: "Communication & Impression", img: "/plaquette-print.jpeg", link: "/print" },
-  { title: "MACOF Mining", subtitle: "Activités minières", img: "/plaquette-mining.jpeg", link: "/mining" },
-  { title: "MACOF Transit", subtitle: "Transit, Logistique & Voyages", img: "/plaquette-logistics.jpeg", link: "/transit" },
-  { title: "MACOF Fishing", subtitle: "Pêche & Ressources", img: "/plaquette-fishing.jpeg", link: "/fishing" },
-];
+  stats: [
+    { value: '2014', label: 'Création historique' },
+    { value: '6', label: 'Filiales expertes' },
+    { value: '100+', label: 'Partenaires B2B' },
+    { value: '3', label: 'Continents desservis' }
+  ],
+
+  realisations: [
+    { title: "Développement Foncier", category: "Immobilier", image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop" },
+    { title: "Gastronomie de Luxe", category: "Restauration", image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1000&auto=format&fit=crop" },
+    { title: "Extraction Minière", category: "Mining", image: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1000&auto=format&fit=crop" },
+    { title: "Campagnes Marketing", category: "Print", image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1000&auto=format&fit=crop" }
+  ],
+
+  partenaires: [
+    { nom: "Partner 1", logo_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/368px-Google_2015_logo.svg.png" },
+    { nom: "Partner 2", logo_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/439px-Microsoft_logo.svg.png" },
+    { nom: "Partner 3", logo_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/600px-Amazon_logo.svg.png" }
+  ],
+  
+  temoignages: [
+    { 
+      nom: "Jean-Pierre Duparc", 
+      poste: "Directeur des Opérations", 
+      entreprise: "Groupe Bolloré", 
+      message: "L'expertise de MACOF dans la gestion logistique et le transit a radicalement amélioré nos délais de livraison. Un partenaire de confiance absolu.",
+      avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop"
+    },
+    { 
+      nom: "Aminata Diallo", 
+      poste: "CEO", 
+      entreprise: "Global Trade Africa", 
+      message: "Nous collaborons avec MACOF Immobilier depuis 3 ans sur des projets d'envergure. Leur rigueur et leur respect des normes internationales sont exemplaires.",
+      avatar_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop"
+    }
+  ]
+};
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
-  const filialesRef = useRef<HTMLDivElement>(null);
-  const [content, setContent] = useState<any>(null);
-  const [filiales, setFiliales] = useState<any[]>([]);
+  const introRef = useRef<HTMLDivElement>(null);
+  
+  const [content, setContent] = useState<any>(MACOF_DATA);
+  const [filiales, setFiliales] = useState<any[]>(MACOF_DATA.filiales);
 
   useEffect(() => {
+    // API Call pour maintenir la flexibilité CMS, mais fallback fort
     const fetchContent = async () => {
       try {
-        const [resContent, resFiliales] = await Promise.all([
+        const [resContent, resFiliales, resGalerie] = await Promise.all([
           axios.get('/api/v1/pages/home'),
-          axios.get('/api/v1/filiales')
+          axios.get('/api/v1/filiales'),
+          axios.get('/api/v1/galerie?limit=4')
         ]);
         
-        if (resContent.data.success) {
-          setContent(resContent.data.data);
+        let newContent = { ...MACOF_DATA };
+        if (resContent.data.success && Object.keys(resContent.data.data).length > 0) {
+          const fetchedData = { ...resContent.data.data };
+          if (fetchedData.partenaires && typeof fetchedData.partenaires === 'string') {
+            try {
+              fetchedData.partenaires = JSON.parse(fetchedData.partenaires);
+              if (!Array.isArray(fetchedData.partenaires) || fetchedData.partenaires.length === 0) {
+                  delete fetchedData.partenaires;
+              }
+            } catch {
+              delete fetchedData.partenaires;
+            }
+          }
+          if (fetchedData.stats && typeof fetchedData.stats === 'string') {
+            try {
+              fetchedData.stats = JSON.parse(fetchedData.stats);
+              if (!Array.isArray(fetchedData.stats) || fetchedData.stats.length === 0) {
+                  delete fetchedData.stats;
+              }
+            } catch {
+              delete fetchedData.stats;
+            }
+          }
+          if (fetchedData.temoignages && typeof fetchedData.temoignages === 'string') {
+            try {
+              fetchedData.temoignages = JSON.parse(fetchedData.temoignages);
+              if (!Array.isArray(fetchedData.temoignages) || fetchedData.temoignages.length === 0) {
+                  delete fetchedData.temoignages;
+              }
+            } catch {
+              delete fetchedData.temoignages;
+            }
+          }
+          newContent = mergeContent(newContent, fetchedData);
         }
         
-        if (resFiliales.data.success) {
-          const formatted = resFiliales.data.data.map((f: any) => {
-            return {
-              title: f.nom,
-              subtitle: f.secteur || 'Expertise',
-              img: f.image_path || "/plaquette-building.jpeg",
-              link: routeMap[f.nom] || '/domaines'
-            };
+        if (resGalerie.data.success && resGalerie.data.data.items?.length > 0) {
+          newContent.realisations = resGalerie.data.data.items.slice(0, 4).map((g: any) => ({
+            title: g.titre,
+            category: g.type_projet || g.filiale_nom || 'Projet',
+            image: g.image_path
+          }));
+        }
+        setContent(newContent);
+        
+        if (resFiliales.data.success && resFiliales.data.data.length > 0) {
+          const apiData = resFiliales.data.data;
+          const formatted = MACOF_DATA.filiales.map((fallback) => {
+            const f = apiData.find((apiItem: any) => 
+              apiItem.slug === fallback.link.replace('/', '') || 
+              apiItem.nom?.toLowerCase().includes(fallback.title.split(' ')[1].toLowerCase()) ||
+              (apiItem.nom?.toLowerCase().includes(fallback.title.split(' ')[0].toLowerCase()) && fallback.title.split(' ')[0] !== 'MACOF')
+            );
+            if (f) {
+              const apiImg = f.image_url || f.image_path;
+              // If we have an API img, use it. If not, use fallback img.
+              const finalImg = apiImg ? (apiImg.startsWith('http') || apiImg.startsWith('/') ? apiImg : `/uploads/${apiImg}`) : fallback.img;
+              return {
+                title: f.nom || fallback.title,
+                subtitle: f.secteur || fallback.subtitle,
+                img: finalImg,
+                fallbackImg: fallback.img,
+                link: fallback.link
+              };
+            }
+            return { ...fallback, fallbackImg: fallback.img };
           });
           setFiliales(formatted);
         }
       } catch (error) {
-        console.error("Failed to load home data", error);
-        // Fallback pour afficher l'interface même si l'API échoue (ex: Netlify)
-        setContent({
-          hero_title_small: 'MACOF Holding',
-          hero_title_main: "L'Art de façonner <br/><span class=\"italic text-red-500 font-light\">l'avenir.</span>",
-          hero_desc: "Groupe guinéen multi-sectoriel, MACOF Holding construit et transforme durablement des secteurs stratégiques de l'économie à travers six filiales spécialisées : Immobilier, Restauration, Communication, Mining, Transit et Pêche.",
-          vision_title_small: 'Notre Vision',
-          vision_desc_1: "MACOF Holding est un groupe de droit guinéen, structuré autour d'une vision ambitieuse : construire, développer et transformer durablement des secteurs stratégiques de l'économie.",
-          vision_desc_2: "À travers une organisation moderne et une gouvernance rigoureuse, le groupe incarne « l'art de façonner l'avenir » en créant de la valeur durable pour ses partenaires, ses collaborateurs et la nation.",
-          hero_bg: "/plaquette-banner.jpeg"
-        }); 
-        setFiliales(FILIALES);
+        console.warn("Using local fallback content");
       }
     };
     fetchContent();
   }, []);
 
-  // Polling for real-time data sync
   useEffect(() => {
-    const pollInterval = setInterval(async () => {
-      try {
-        const resFiliales = await axios.get('/api/v1/filiales');
-        if (resFiliales.data.success) {
-          const formatted = resFiliales.data.data.map((f: any) => {
-            return {
-              title: f.nom,
-              subtitle: f.secteur || 'Expertise',
-              img: f.image_path || "/plaquette-building.jpeg",
-              link: routeMap[f.nom] || '/domaines'
-            };
-          });
-          setFiliales(formatted);
-        }
-      } catch (e) { /* silently ignore polling errors */ }
-    }, 30000);
-    return () => clearInterval(pollInterval);
-  }, []);
-
-  useEffect(() => {
-    if (!content) return; // Wait for content before animating
-
     const ctx = gsap.context(() => {
-      // Hero Animation
+      // 1. Hero Animations
       gsap.fromTo(".hero-title", 
-        { y: 150, opacity: 0, clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)" },
-        { y: 0, opacity: 1, clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", duration: 2, ease: "power4.out", delay: 1.2 }
+        { y: 100, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.5, ease: "power4.out", delay: 0.5 }
       );
       
       gsap.fromTo(".hero-desc", 
         { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.5, ease: "power3.out", delay: 1.8, stagger: 0.2 }
+        { y: 0, opacity: 1, duration: 1.2, ease: "power3.out", delay: 1, stagger: 0.2 }
       );
 
       gsap.to(".hero-bg", {
@@ -122,254 +186,300 @@ export default function Home() {
         }
       });
 
-      const cards = gsap.utils.toArray('.reveal-card');
-      cards.forEach((card: any) => {
-        gsap.fromTo(card, 
-          { y: 100, opacity: 0 },
+      // 2. Scroll Reveal General
+      const revealElements = gsap.utils.toArray('.reveal-up');
+      revealElements.forEach((el: any) => {
+        gsap.fromTo(el, 
+          { y: 60, opacity: 0 },
           { 
-            y: 0, opacity: 1, duration: 1.5, ease: "expo.out",
+            y: 0, opacity: 1, duration: 1.2, ease: "expo.out",
             scrollTrigger: {
-              trigger: card,
+              trigger: el,
               start: "top 85%"
             }
           }
         );
       });
+
+      // 3. Compteurs Animés
+      const stats = gsap.utils.toArray('.stat-number');
+      stats.forEach((stat: any) => {
+        const targetValue = parseInt(stat.getAttribute('data-value') || '0', 10);
+        if (!isNaN(targetValue)) {
+          gsap.fromTo(stat, 
+            { innerHTML: 0 },
+            { 
+              innerHTML: targetValue,
+              duration: 2,
+              ease: "power2.out",
+              snap: { innerHTML: 1 },
+              scrollTrigger: {
+                trigger: stat,
+                start: "top 85%"
+              }
+            }
+          );
+        }
+      });
     });
     return () => ctx.revert();
   }, [content]);
 
-  if (!content) {
-    return <div className="h-screen bg-background flex items-center justify-center text-white">Chargement...</div>;
-  }
-
   return (
     <AnimatedPage className="bg-background">
-      {/* 1. Bandeau Hero Plein Écran (Bleu vif 20%) */}
-      <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
+      {/* SECTION 1: HERO PREMIUM */}
+      <section ref={heroRef} className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-black">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-blue-900/60 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
           <img 
-            src={content.hero_bg || "/plaquette-banner.jpeg"}
+            src={getImageUrl(content.hero_bg)}
             alt="MACOF Building" 
-            className="hero-bg w-full h-[120%] object-cover object-center -top-[10%]"
+            className="hero-bg w-full h-[120%] object-cover object-center -top-[10%] opacity-80"
           />
         </div>
         
-        <div className="relative z-20 text-center px-4 w-full max-w-7xl mx-auto flex flex-col items-center">
-          <div className="hero-title overflow-hidden mb-8">
-            <p className="text-white text-xs tracking-[0.4em] uppercase font-sans mb-8">{content.hero_title_small || 'MACOF Holding'}</p>
-            <h1 className="text-5xl md:text-8xl lg:text-[8rem] font-serif text-white tracking-tight leading-[1.1]" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.hero_title_main || "L'Art de façonner <br/><span class=\"italic text-red-500 font-light\">l'avenir.</span>") }}>
-            </h1>
+        <div className="relative z-20 px-6 w-full max-w-7xl mx-auto pt-20">
+          <div className="max-w-4xl">
+            <p className="hero-title text-red-600 text-sm tracking-[0.4em] uppercase font-sans mb-6 font-semibold flex items-center gap-4">
+              <span className="w-12 h-[2px] bg-red-600"></span>
+              {content.hero_title_small}
+            </p>
+            <h1 className="hero-title text-5xl md:text-7xl lg:text-[6rem] font-serif text-white tracking-tight leading-[1.1] mb-8" 
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.hero_title_main) }} />
+            <p className="hero-desc text-base md:text-xl text-gray-300 font-sans font-light leading-relaxed mb-12 max-w-2xl border-l-2 border-white/20 pl-6">
+              {content.hero_desc}
+            </p>
+            <div className="hero-desc flex flex-wrap gap-4">
+              <Link to="/domaines">
+                <Button variant="luxury" size="lg" className="bg-red-600 text-white hover:bg-red-700 shadow-none px-8">Découvrir le groupe</Button>
+              </Link>
+              <Link to="/about">
+                <Button variant="outline" size="lg" className="text-white border-white/30 hover:bg-white hover:text-black px-8">Notre Vision</Button>
+              </Link>
+            </div>
           </div>
-          <p className="hero-desc text-sm md:text-lg text-white max-w-2xl mx-auto font-sans font-light leading-relaxed mb-12">
-            {content.hero_desc || "Construire, développer et transformer durablement des secteurs stratégiques de l'économie guinéenne et internationale."}
-          </p>
-          <div className="hero-desc flex gap-6">
-            <Link to="/domaines">
-              <Button variant="luxury" size="lg" className="bg-red-600 text-white hover:bg-red-700 shadow-none">Découvrir le groupe</Button>
-            </Link>
-            <Link to="/contact">
-              <Button variant="outline" size="lg" className="text-white border-white hover:bg-white/10 hover:text-white">Nous contacter</Button>
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* 2. Présentation Synthétique (Rouge 15%) */}
-      <section className="py-32 bg-secondary relative z-30">
-        <div className="max-w-5xl mx-auto px-6 lg:px-12 text-center reveal-card">
-          <h2 className="text-sm font-sans tracking-[0.3em] text-white uppercase mb-8">{content.vision_title_small || 'Une Vision Ambitieuse'}</h2>
-          <p className="text-2xl md:text-4xl font-serif text-white leading-relaxed font-light mb-8">
-            {content.vision_desc_1}
-          </p>
-          <p className="text-red-100 font-light text-lg leading-relaxed">
-            {content.vision_desc_2}
-          </p>
-        </div>
-      </section>
-
-      {/* 3. Nos domaines d'activité (Bleu Nuit 20%) */}
-      <section ref={filialesRef} className="py-32 px-6 lg:px-12 max-w-[100rem] mx-auto bg-background">
-        <div className="flex justify-between items-end border-b border-white/10 pb-8 mb-16 reveal-card">
-          <h2 className="text-3xl md:text-5xl font-serif text-foreground">Nos <span className="text-primary italic">Expertises</span></h2>
-          <Link to="/domaines" className="text-xs font-sans tracking-widest text-muted-foreground hover:text-foreground uppercase">Voir tout →</Link>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {(filiales.length > 0 ? filiales : FILIALES).map((item, i) => (
-            <Link 
-              to={item.link} 
-              key={i} 
-              className="reveal-card filiale-card group relative block overflow-hidden aspect-[4/5] border border-white/5"
-            >
-              <img 
-                src={item.img} 
-                alt={item.title} 
-                className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-[2s] ease-out filter grayscale-[40%] group-hover:grayscale-0"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-900/40 to-transparent group-hover:from-blue-900/80 transition-colors duration-700" />
-              
-              <div className="absolute bottom-0 left-0 p-8 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                <p className="text-white text-xs uppercase tracking-[0.2em] font-sans mb-3 flex items-center gap-4">
-                  <span className="w-8 h-[1px] bg-red-500 block"></span> 
-                  {item.subtitle}
-                </p>
-                <h3 className="text-3xl font-serif text-white font-light">{item.title}</h3>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* 4. Chiffres Clés (Blanc 10%) */}
-      <section className="py-24 bg-white">
+      {/* SECTION 2: INTRODUCTION ASYMÉTRIQUE */}
+      <section ref={introRef} className="py-24 bg-white relative z-30">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-            {(content?.stats ? JSON.parse(content.stats) : [
-              { value: '2018', label: 'Création' },
-              { value: '6', label: 'Filiales' },
-              { value: '120+', label: 'Projets réalisés' },
-              { value: '2500', label: 'Collaborateurs' }
-            ]).map((stat: any, i: number) => (
-              <div key={i} className="reveal-card">
-                <div className="text-5xl md:text-7xl font-serif text-black mb-4">{stat.value}</div>
-                <div className="text-xs font-sans tracking-widest text-primary uppercase">{stat.label}</div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="reveal-up">
+              <h2 className="text-sm font-sans tracking-[0.3em] text-red-600 uppercase mb-6 font-semibold">{content.vision_title_small}</h2>
+              <h3 className="text-3xl md:text-5xl font-serif text-gray-900 leading-tight mb-8">
+                {content.vision_desc_1}
+              </h3>
+              <p className="text-gray-600 font-light text-lg leading-relaxed mb-8">
+                {content.vision_desc_2}
+              </p>
+              <ul className="space-y-4">
+                {['Performance accrue', 'Gouvernance stricte', 'Développement durable'].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-800 font-medium">
+                    <CheckCircle className="text-red-600" size={20} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="reveal-up relative">
+              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1000&auto=format&fit=crop" alt="Bureau Corporate" className="w-full h-full object-cover" />
               </div>
-            ))}
+              <div className="absolute -bottom-8 -left-8 bg-blue-900 text-white p-8 rounded shadow-2xl hidden md:block">
+                <ShieldCheck size={48} className="text-red-500 mb-4" />
+                <p className="font-serif text-2xl font-light">Une fiabilité<br/>à toute épreuve.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 5. Pourquoi nous choisir (Rouge 15%) */}
-      <section className="py-32 px-6 lg:px-12 w-full bg-secondary">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20 reveal-card">
-            <h2 className="text-sm font-sans tracking-[0.3em] text-red-200 uppercase mb-6">Notre ADN</h2>
-            <h3 className="text-4xl md:text-5xl font-serif text-white font-light">L'excellence comme standard</h3>
+      {/* SECTION 3: NOS 6 PILIERS D'EXCELLENCE */}
+      <section className="py-32 px-6 lg:px-12 bg-gray-50 border-t border-gray-200">
+        <div className="max-w-[100rem] mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 reveal-up">
+            <div>
+              <h2 className="text-sm font-sans tracking-[0.3em] text-red-600 uppercase mb-4 font-semibold">Nos Filiales</h2>
+              <h3 className="text-4xl md:text-5xl font-serif text-gray-900">Nos 6 Piliers <span className="text-red-600 italic">d'Excellence</span></h3>
+            </div>
+            <Link to="/domaines" className="text-sm font-sans tracking-widest text-gray-500 hover:text-black uppercase flex items-center gap-2 mt-6 md:mt-0">
+              Voir tout le portefeuille <ChevronRight size={16} />
+            </Link>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {(content?.reasons ? JSON.parse(content.reasons) : [
-              { title: "Diversification Stratégique", desc: "Une présence forte dans 6 secteurs clés de l'économie guinéenne et internationale, assurant résilience et croissance continue." },
-              { title: "Gouvernance Rigoureuse", desc: "Des processus de décision structurés et une éthique professionnelle irréprochable garantissant transparence et confiance." },
-              { title: "Expertise Sectorielle", desc: "Une maîtrise pointue de chaque domaine d'activité grâce à des équipes spécialisées et expérimentées." },
-              { title: "Ancrage Local", desc: "Une connaissance profonde du marché local couplée à des standards internationaux de qualité et de sécurité." }
-            ]).map((arg: any, i: number) => (
-              <div key={i} className="reveal-card p-8 border border-white/20 bg-white/[0.05] hover:bg-white/[0.1] transition-colors">
-                <div className="text-white text-4xl font-serif mb-6">0{i+1}.</div>
-                <h4 className="text-xl font-serif text-white mb-4">{arg.title}</h4>
-                <p className="text-red-100 font-light leading-relaxed text-sm">{arg.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Réalisations (Background Noir) */}
-      <section className="py-32 px-6 lg:px-12 bg-background">
-        <div className="max-w-[100rem] mx-auto">
-          <div className="flex justify-between items-end border-b border-white/10 pb-8 mb-16 reveal-card">
-            <h2 className="text-3xl md:text-5xl font-serif text-white">Nos <span className="text-primary italic">Réalisations</span> phares</h2>
-            <Link to="/galerie" className="text-xs font-sans tracking-widest text-muted-foreground hover:text-white uppercase">Explorer la galerie →</Link>
-          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(content?.realisations ? JSON.parse(content.realisations) : [
-              { title: "Cité MACOF Résidence", category: "Immobilier", image: "/plaquette-construction.jpeg" },
-              { title: "SEBA International", category: "Restauration", image: "/plaquette-resto.jpeg" },
-              { title: "Opérations Minières", category: "Mining", image: "/plaquette-mining.jpeg" },
-              { title: "Impression Offset", category: "Print & Com", image: "/plaquette-print.jpeg" },
-              { title: "Logistique Portuaire", category: "Transit", image: "/plaquette-logistics.jpeg" },
-              { title: "Flotte Côtière", category: "Fishing", image: "/plaquette-fishing.jpeg" },
-            ]).map((item: any, idx: number) => (
-              <div key={idx} className="group relative overflow-hidden aspect-video reveal-card">
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                  <span className="text-red-500 text-xs font-sans tracking-widest uppercase mb-2">{item.category}</span>
-                  <h4 className="text-white text-xl font-serif">{item.title}</h4>
+            {filiales.map((item, i) => (
+              <Link 
+                to={item.link} 
+                key={i} 
+                className="reveal-up group relative block overflow-hidden aspect-[4/3] rounded bg-white shadow-sm hover:shadow-xl transition-all duration-500"
+              >
+                <div className="absolute inset-0 overflow-hidden">
+                  <img 
+                    src={getImageUrl(item.img)} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-[1.5s] ease-out filter grayscale-[20%] group-hover:grayscale-0"
+                    onError={(e) => { e.currentTarget.src = (item as any).fallbackImg || DEFAULT_FALLBACK_IMAGE; }}
+                  />
                 </div>
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent group-hover:from-black/80 transition-colors duration-500" />
+                
+                <div className="absolute bottom-0 left-0 p-8 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                  <p className="text-red-500 text-xs uppercase tracking-[0.2em] font-sans mb-3 font-semibold">
+                    {item.subtitle}
+                  </p>
+                  <h4 className="text-2xl font-serif text-white font-light group-hover:text-red-100 transition-colors">{item.title}</h4>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 7. Témoignages (Bleu Nuit 20%) */}
-      <section className="py-32 px-6 lg:px-12 bg-primary relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-900/20 blur-[120px] pointer-events-none" />
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-20 reveal-card">
-            <h2 className="text-sm font-sans tracking-[0.3em] text-blue-200 uppercase mb-6">Confiance</h2>
-            <h3 className="text-4xl md:text-5xl font-serif text-white font-light">Ce qu'ils disent de nous</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {(content?.temoignages ? JSON.parse(content.temoignages) : [
-              { text: "L'expertise de MACOF dans l'accompagnement de nos projets immobiliers a été déterminante. Une rigueur et un professionnalisme exemplaires.", auteur: "Directeur Général", entreprise: "Banque d'Investissement" },
-              { text: "Nous travaillons avec MACOF Transit pour toutes nos importations. Leur efficacité logistique et leur suivi en temps réel sont inégalés sur le marché.", auteur: "Responsable Achats", entreprise: "Société Industrielle" },
-              { text: "La qualité du service traiteur de SEBA International a grandement contribué au succès de notre gala annuel. Une prestation haut de gamme.", auteur: "Directrice Communication", entreprise: "Multinationale Minière" }
-            ]).map((testi: any, i: number) => (
-              <div key={i} className="reveal-card p-10 bg-white/[0.03] border border-white/10 backdrop-blur-sm relative">
-                <div className="text-6xl font-serif text-red-500/20 absolute top-6 left-6">"</div>
-                <p className="text-white font-light leading-relaxed mb-8 relative z-10">
-                  {testi.text}
-                </p>
-                <div>
-                  <h4 className="text-white font-serif">{testi.auteur}</h4>
-                  <p className="text-blue-200 text-sm font-light">{testi.entreprise}</p>
+      {/* SECTION 4: CHIFFRES CLÉS ANIMÉS */}
+      <section className="py-24 bg-blue-950 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 50%)' }}></div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center divide-x divide-white/10">
+            {content.stats.map((stat: any, i: number) => {
+              const numericMatch = stat.value.match(/\\d+/);
+              const number = numericMatch ? numericMatch[0] : stat.value;
+              const suffix = stat.value.replace(number, '');
+              
+              return (
+                <div key={i} className="reveal-up px-4">
+                  <div className="text-5xl md:text-7xl font-serif text-white mb-4 flex items-center justify-center">
+                    <span className="stat-number" data-value={number}>{number}</span>
+                    <span className="text-red-500">{suffix}</span>
+                  </div>
+                  <div className="text-xs font-sans tracking-widest text-blue-200 uppercase">{stat.label}</div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* 8. Actualités (Blanc) */}
+      {/* SECTION 5: APERÇU GALERIE */}
       <section className="py-32 px-6 lg:px-12 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-end border-b border-black/10 pb-8 mb-16 reveal-card">
-            <h2 className="text-3xl md:text-5xl font-serif text-black">Dernières <span className="text-primary italic">Actualités</span></h2>
+          <div className="text-center mb-16 reveal-up">
+            <h2 className="text-sm font-sans tracking-[0.3em] text-red-600 uppercase mb-4 font-semibold">Galerie</h2>
+            <h3 className="text-4xl md:text-5xl font-serif text-gray-900 mb-6">Nos Meilleures <span className="italic text-gray-500">Réalisations</span></h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {(content?.actualites ? JSON.parse(content.actualites) : [
-              { date: "12 Juin 2026", category: "Institutionnel", title: "MACOF Holding inaugure son nouveau siège à Conakry", image: "/plaquette-building.jpeg" },
-              { date: "05 Juin 2026", category: "Immobilier", title: "Lancement du projet résidentiel haut de gamme 'Les Perles de Kaloum'", image: "/plaquette-construction.jpeg" },
-              { date: "28 Mai 2026", category: "Restauration", title: "SEBA International remporte le prix du meilleur traiteur B2B", image: "/plaquette-resto.jpeg" },
-            ]).map((news: any, i: number) => (
-              <div key={i} className="group cursor-pointer reveal-card">
-                <div className="overflow-hidden aspect-video mb-6 relative">
-                  <img src={news.image} alt={news.title} className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute top-4 left-4 bg-primary text-white text-xs px-3 py-1 uppercase tracking-widest font-sans">
-                    {news.category}
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(Array.isArray(content.realisations) ? content.realisations : MACOF_DATA.realisations).map((item: any, idx: number) => (
+              <div key={idx} className={`group relative overflow-hidden reveal-up ${idx === 0 || idx === 3 ? 'aspect-[16/9]' : 'aspect-square'}`}>
+                <img 
+                  src={getImageUrl(item.image)} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-700" 
+                  onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-6 backdrop-blur-sm">
+                  <span className="text-red-500 text-xs font-sans tracking-widest uppercase mb-3 bg-white px-3 py-1 rounded-full">{item.category}</span>
+                  <h4 className="text-white text-2xl font-serif">{item.title}</h4>
                 </div>
-                <div className="text-sm font-sans tracking-widest text-gray-500 mb-3">{news.date}</div>
-                <h3 className="text-xl font-serif text-black leading-tight group-hover:text-primary transition-colors">{news.title}</h3>
+              </div>
+            ))}
+          </div>
+          <div className="mt-12 text-center reveal-up">
+            <Link to="/galerie">
+              <Button variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50">Découvrir toute la galerie</Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION PARTENAIRES */}
+      <section className="py-24 bg-gray-50 border-t border-gray-200 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 mb-12 text-center reveal-up">
+          <h2 className="text-sm font-sans tracking-[0.3em] text-red-600 uppercase mb-4 font-semibold">Nos Partenaires</h2>
+          <h3 className="text-3xl md:text-4xl font-serif text-gray-900">Ils nous font <span className="italic text-gray-500">confiance</span></h3>
+        </div>
+        
+        <div className="relative flex overflow-hidden group">
+          <div className="animate-marquee flex gap-16 items-center min-w-full">
+            {(content.partenaires || MACOF_DATA.partenaires).map((p: any, i: number) => (
+              <div key={i} className="flex-shrink-0 flex flex-col items-center justify-center gap-4">
+                <img 
+                  src={getImageUrl(p.logo_url)} 
+                  alt={p.nom} 
+                  className="h-16 w-auto object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
+            ))}
+            {/* Duplication for seamless infinite scroll */}
+            {(content.partenaires || MACOF_DATA.partenaires).map((p: any, i: number) => (
+              <div key={`dup-${i}`} className="flex-shrink-0 flex flex-col items-center justify-center gap-4">
+                <img 
+                  src={getImageUrl(p.logo_url)} 
+                  alt={p.nom} 
+                  className="h-16 w-auto object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 9. CTA Final (Bleu Corporate 10%) */}
-      <section className="py-32 bg-primary text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-blue-600 blur-[100px] rounded-full pointer-events-none w-1/2 h-1/2 left-1/4 top-1/4 opacity-50" />
-        <div className="relative z-10 max-w-3xl mx-auto px-6">
-          <h2 className="text-4xl md:text-6xl font-serif text-white mb-8 font-light">Prêt à façonner <span className="text-white italic">l'avenir</span> avec nous ?</h2>
-          <p className="text-white mb-12 text-lg font-light">Discutons de vos projets, de vos investissements ou de vos ambitions.</p>
-          <Link to="/contact">
-            <Button variant="luxury" size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-none">Contactez le groupe</Button>
-          </Link>
-          <a href="https://wa.me/224625744626" target="_blank" rel="noopener noreferrer"
-             className="inline-flex items-center gap-2 mt-6 px-6 py-3 border border-white/30 text-white rounded hover:bg-white/10 transition-colors">
-            <MessageCircle size={20} />
-            <span className="text-sm tracking-widest uppercase">WhatsApp</span>
-          </a>
+      {/* SECTION TÉMOIGNAGES */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-slate-50 -skew-x-12 translate-x-20 z-0 hidden lg:block" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+          <div className="text-center mb-16 reveal-up">
+            <h2 className="text-sm font-sans tracking-[0.3em] text-red-600 uppercase mb-4 font-semibold flex items-center justify-center gap-3">
+              <MessageCircle size={18} /> Paroles de Partenaires
+            </h2>
+            <h3 className="text-4xl md:text-5xl font-serif text-gray-900">L'Excellence <span className="italic text-gray-500">Reconnue</span></h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            {(content.temoignages || MACOF_DATA.temoignages).map((t: any, i: number) => (
+              <div key={i} className="reveal-up bg-white border border-gray-100 p-8 shadow-xl relative group hover:-translate-y-2 transition-transform duration-500">
+                <div className="absolute top-8 right-8 text-gray-100 group-hover:text-red-50 transition-colors duration-500">
+                  <MessageCircle size={64} className="fill-current" />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-6">
+                    <img 
+                      src={getImageUrl(t.avatar_url)} 
+                      alt={t.nom} 
+                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm"
+                    />
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-900">{t.nom}</h4>
+                      <p className="text-sm font-semibold text-red-600 uppercase tracking-wide">{t.poste}</p>
+                      <p className="text-sm text-gray-500">{t.entreprise}</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 font-light leading-relaxed text-lg italic">
+                    "{t.message}"
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 6: CTA FINAL PERCUTANT */}
+      <section className="py-32 bg-red-600 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2000&auto=format&fit=crop')] mix-blend-multiply opacity-20 object-cover" />
+        <div className="relative z-10 max-w-4xl mx-auto px-6">
+          <h2 className="text-4xl md:text-6xl font-serif text-white mb-8 font-light">Prêt à construire l'avenir ensemble ?</h2>
+          <p className="text-red-100 mb-12 text-xl font-light">Que vous cherchiez un partenariat B2B stratégique ou des services de très haute qualité, notre groupe est à votre écoute.</p>
+          <div className="flex flex-wrap justify-center gap-6">
+            <Link to="/contact">
+              <Button variant="luxury" size="lg" className="bg-white text-red-600 hover:bg-gray-100 shadow-xl px-10 py-6 text-lg">Contactez-nous</Button>
+            </Link>
+          </div>
         </div>
       </section>
 
     </AnimatedPage>
   );
 }
-
-
-

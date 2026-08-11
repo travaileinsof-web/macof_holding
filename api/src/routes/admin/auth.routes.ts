@@ -6,6 +6,7 @@ import { success, error } from '../../utils/response';
 import { authMiddleware } from '../../middleware/auth';
 import type { AuthUser } from '../../middleware/auth';
 import { compare, hash } from 'bcryptjs';
+import { eventEmitter } from '../../services/events';
 import {
   filialeSchema,
   galerieSchema,
@@ -44,40 +45,43 @@ function getIdParam(c: any): number {
 const adminDashboard = new Hono();
 
 // GET /api/admin/dashboard/stats
-adminDashboard.get('/stats', authMiddleware, async (c) => {
+adminDashboard.get('/', authMiddleware, async (c) => {
   getUser(c);
 
-  const [totalDemandes] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(demandes_contact)
-    .where(eq(demandes_contact.archived, false));
+  const safeCount = async (queryFn: () => Promise<Array<{ count: number }>>) => {
+    try {
+      const [row] = await queryFn();
+      return Number(row?.count ?? 0);
+    } catch {
+      return 0;
+    }
+  };
 
-  const [nouvellesDemandes] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(demandes_contact)
-    .where(and(eq(demandes_contact.archived, false), eq(demandes_contact.statut, 'nouveau')));
-
-  const [totalFiliales] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(filiales)
-    .where(eq(filiales.archived, false));
-
-  const [totalGalerie] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(galerie)
-    .where(eq(galerie.archived, false));
-
-  const [totalCatalogues] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(catalogues)
-    .where(eq(catalogues.archived, false));
+  const [totalDemandes, nouvellesDemandes, totalFiliales, totalGalerie, totalCatalogues] =
+    await Promise.all([
+      safeCount(() =>
+        db.select({ count: sql<number>`count(*)` }).from(demandes_contact).where(eq(demandes_contact.archived, false))
+      ),
+      safeCount(() =>
+        db.select({ count: sql<number>`count(*)` }).from(demandes_contact).where(and(eq(demandes_contact.archived, false), eq(demandes_contact.statut, 'nouveau')))
+      ),
+      safeCount(() =>
+        db.select({ count: sql<number>`count(*)` }).from(filiales).where(eq(filiales.archived, false))
+      ),
+      safeCount(() =>
+        db.select({ count: sql<number>`count(*)` }).from(galerie).where(eq(galerie.archived, false))
+      ),
+      safeCount(() =>
+        db.select({ count: sql<number>`count(*)` }).from(catalogues).where(eq(catalogues.archived, false))
+      ),
+    ]);
 
   return success(c, {
-    total_demandes: totalDemandes?.count || 0,
-    nouvelles_demandes: nouvellesDemandes?.count || 0,
-    total_filiales: totalFiliales?.count || 0,
-    total_galerie: totalGalerie?.count || 0,
-    total_catalogues: totalCatalogues?.count || 0,
+    total_demandes: totalDemandes,
+    nouvelles_demandes: nouvellesDemandes,
+    total_filiales: totalFiliales,
+    total_galerie: totalGalerie,
+    total_catalogues: totalCatalogues,
   });
 });
 
@@ -305,17 +309,24 @@ adminGalerie.get('/', authMiddleware, async (c) => {
 });
 
 adminGalerie.post('/', authMiddleware, async (c) => {
-  const body = await c.req.json();
-  const parsed = galerieSchema.safeParse(body);
-
-  if (!parsed.success) {
-    return error(c, getValidationError(parsed.error), 422);
+  const body = await c.req.parseBody();
+  const file = body['image'] as File | undefined;
+  
+  if (!file) {
+    return error(c, 'Image requise', 422);
   }
 
-  const data = parsed.data;
+  const titre = body['titre'] as string;
+  if (!titre) {
+    return error(c, 'Titre requis', 422);
+  }
+
+  const image_path = await uploadFile(file, 'galerie');
+  
   let filialeId: number | null = null;
-  if (data.filiale) {
-    const fv = data.filiale;
+  const filialeRaw = body['filiale'];
+  if (filialeRaw) {
+    const fv = filialeRaw;
     if (typeof fv === 'number') filialeId = fv;
     else if (/^\d+$/.test(String(fv))) filialeId = parseInt(String(fv), 10);
     else {
@@ -327,16 +338,17 @@ adminGalerie.post('/', authMiddleware, async (c) => {
   const [created] = await db
     .insert(galerie)
     .values({
-      titre: data.titre,
+      titre,
       filiale: filialeId,
-      type_projet: data.type_projet || null,
-      lieu: data.lieu || null,
-      date_realisation: data.date_realisation || null,
-      description_courte: data.description_courte || null,
-      image_path: data.image_path,
-    })
+      type_projet: body['type_projet'] as string || null,
+      lieu: body['lieu'] as string || null,
+      date_realisation: body['date_realisation'] as string || null,
+      description_courte: body['description_courte'] as string || null,
+      image_path,
+    } as any)
     .returning();
 
+  eventEmitter.emit('invalidate', { entity: 'galerie' });
   return success(c, created, 'Element de galerie cree', 201);
 });
 
@@ -443,17 +455,24 @@ adminCatalogues.get('/', authMiddleware, async (c) => {
 });
 
 adminCatalogues.post('/', authMiddleware, async (c) => {
-  const body = await c.req.json();
-  const parsed = catalogueSchema.safeParse(body);
-
-  if (!parsed.success) {
-    return error(c, getValidationError(parsed.error), 422);
+  const body = await c.req.parseBody();
+  const file = body['file'] as File | undefined;
+  
+  if (!file) {
+    return error(c, 'Fichier requis', 422);
   }
 
-  const data = parsed.data;
+  const titre = body['titre'] as string;
+  if (!titre) {
+    return error(c, 'Titre requis', 422);
+  }
+
+  const file_path = await uploadFile(file, 'catalogues');
+  
   let filialeId: number | null = null;
-  if (data.filiale) {
-    const fv = data.filiale;
+  const filialeRaw = body['filiale'];
+  if (filialeRaw) {
+    const fv = filialeRaw;
     if (typeof fv === 'number') filialeId = fv;
     else if (/^\d+$/.test(String(fv))) filialeId = parseInt(String(fv), 10);
     else {
@@ -462,18 +481,25 @@ adminCatalogues.post('/', authMiddleware, async (c) => {
     }
   }
 
+  const taille_ko = Math.round(file.size / 1024);
+  const type_document = body['type_document'] as string || 'catalogue';
+  let format = 'PDF';
+  if (file.type.includes('image')) format = 'IMAGE';
+  if (file.type.includes('word')) format = 'WORD';
+
   const [created] = await db
     .insert(catalogues)
     .values({
-      titre: data.titre,
+      titre,
       filiale: filialeId,
-      type_document: data.type_document,
-      file_path: data.file_path,
-      taille_ko: data.taille_ko || null,
-      format: data.format,
+      type_document: type_document as any,
+      file_path,
+      taille_ko,
+      format,
     })
     .returning();
 
+  eventEmitter.emit('invalidate', { entity: 'catalogues' });
   return success(c, created, 'Catalogue cree', 201);
 });
 
@@ -550,6 +576,17 @@ adminPages.get('/', authMiddleware, async (c) => {
   return success(c, items);
 });
 
+adminPages.get('/:slug', authMiddleware, async (c) => {
+  const slug = c.req.param('slug');
+  const items = await db
+    .select()
+    .from(page_contents)
+    .where(eq(page_contents.page_slug, slug))
+    .orderBy(asc(page_contents.section_key));
+
+  return success(c, { contents: items });
+});
+
 adminPages.post('/', authMiddleware, async (c) => {
   const body = await c.req.json();
   const parsed = pageContentSchema.safeParse(body);
@@ -568,7 +605,92 @@ adminPages.post('/', authMiddleware, async (c) => {
     })
     .returning();
 
+  eventEmitter.emit('invalidate', { entity: 'pages' });
   return success(c, created, 'Contenu de page cree', 201);
+});
+
+adminPages.post('/bulk', authMiddleware, async (c) => {
+  const body = await c.req.json();
+  const { page_slug, contents } = body;
+  
+  if (!page_slug || !Array.isArray(contents)) {
+    return error(c, 'Paramètres invalides', 422);
+  }
+
+  for (const item of contents) {
+    const { section_key, content_value, content_type } = item;
+    
+    const [existing] = await db
+      .select()
+      .from(page_contents)
+      .where(and(eq(page_contents.page_slug, page_slug), eq(page_contents.section_key, section_key)))
+      .limit(1);
+      
+    if (existing) {
+      await db
+        .update(page_contents)
+        .set({ content_value, updated_at: new Date() })
+        .where(eq(page_contents.id, existing.id));
+    } else {
+      await db
+        .insert(page_contents)
+        .values({
+          page_slug,
+          section_key,
+          content_value,
+          content_type: content_type || 'json'
+        });
+    }
+  }
+
+  eventEmitter.emit('invalidate', { entity: 'pages' });
+  return success(c, null, 'Contenus sauvegardés avec succès', 200);
+});
+
+// POST /:slug (FormData)
+adminPages.post('/:slug', authMiddleware, async (c) => {
+  const slug = c.req.param('slug');
+  const body = await c.req.parseBody();
+  
+  const key = body['key'] as string;
+  let value = body['value'] as string;
+  const image = body['image'] as File | undefined;
+
+  if (!key) {
+    return error(c, 'Clé (key) requise', 422);
+  }
+
+  if (image) {
+    value = await uploadFile(image, 'pages');
+  }
+
+  const [existing] = await db
+    .select()
+    .from(page_contents)
+    .where(and(eq(page_contents.page_slug as any, slug), eq(page_contents.section_key as any, key)))
+    .limit(1);
+
+  let updated;
+  if (existing) {
+    [updated] = await db
+      .update(page_contents)
+      .set({ content_value: value, updated_at: new Date() })
+      .where(eq(page_contents.id, existing.id))
+      .returning();
+  } else {
+    [updated] = await db
+      .insert(page_contents)
+      .values({
+        page_slug: slug,
+        section_key: key,
+        content_value: value,
+        content_type: image ? 'image' : 'text',
+      } as any)
+      .returning();
+  }
+
+  eventEmitter.emit('invalidate', { entity: 'pages' });
+  return success(c, updated, 'Contenu mis a jour');
 });
 
 adminPages.put('/:id', authMiddleware, async (c) => {
@@ -622,17 +744,22 @@ const adminSettings = new Hono();
 
 adminSettings.get('/', authMiddleware, async (c) => {
   getUser(c);
-  const items = await db
-    .select()
-    .from(settings)
-    .orderBy(asc(settings.key));
+  try {
+    const items = await db
+      .select()
+      .from(settings)
+      .orderBy(asc(settings.key));
 
-  const settingsMap: Record<string, string> = {};
-  for (const item of items) {
-    settingsMap[item.key] = item.value || '';
+    const settingsMap: Record<string, string> = {};
+    for (const item of items) {
+      settingsMap[item.key] = item.value || '';
+    }
+
+    return success(c, { list: items, map: settingsMap });
+  } catch (err) {
+    console.error('[Settings GET] DB error:', err);
+    return success(c, { list: [], map: {} });
   }
-
-  return success(c, { list: items, map: settingsMap });
 });
 
 adminSettings.put('/:key', authMiddleware, async (c) => {
@@ -680,22 +807,35 @@ adminSettings.post('/bulk', authMiddleware, async (c) => {
   const results: Array<{ key: string; status: string }> = [];
 
   for (const [key, value] of Object.entries(updates)) {
-    const [existing] = await db
-      .select()
-      .from(settings)
-      .where(eq(settings.key, key))
-      .limit(1);
+    try {
+      const [existing] = await db
+        .select()
+        .from(settings)
+        .where(eq(settings.key, key))
+        .limit(1);
 
-    if (existing) {
-      await db.update(settings).set({ value, updated_at: new Date() } as any).where(eq(settings.key, key));
-      results.push({ key, status: 'updated' });
-    } else {
-      await db.insert(settings).values({ key, value } as any);
-      results.push({ key, status: 'created' });
+      if (existing) {
+        await db.update(settings).set({ value, updated_at: new Date() } as any).where(eq(settings.key, key));
+        results.push({ key, status: 'updated' });
+      } else {
+        await db.insert(settings).values({ key, value } as any);
+        results.push({ key, status: 'created' });
+      }
+    } catch (err) {
+      console.error(`[Settings Bulk] Error saving key "${key}":`, err);
+      results.push({ key, status: 'error' });
     }
   }
 
-  return success(c, results, `${results.length} parametres mis a jour`);
+  return success(c, results, `${results.length} parametres traites`);
+});
+
+adminSettings.post('/test-email', authMiddleware, async (c) => {
+  getUser(c);
+  // Simulation d'envoi d'email
+  console.log('[Email Test] Envoi simulé...');
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  return success(c, null, 'Email de test envoyé avec succès (simulation)');
 });
 
 // ─── Admin: Profile & Password ───────────────────────────────────────────────

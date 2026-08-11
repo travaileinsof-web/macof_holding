@@ -10,7 +10,7 @@ interface ContactFormProps {
   titre?: string;
 }
 
-export function ContactForm({ filiale = 'MACOF Holding', typeDemande = 'contact', titre = "Nous Contacter" }: ContactFormProps) {
+export function ContactForm({ filiale = 'MACOF Holding', typeDemande = 'information', titre = "Nous Contacter" }: ContactFormProps) {
   const [formData, setFormData] = useState({
     nom_complet: '',
     email: '',
@@ -23,6 +23,7 @@ export function ContactForm({ filiale = 'MACOF Holding', typeDemande = 'contact'
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [reference, setReference] = useState('');
   const [whatsappUrl, setWhatsappUrl] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,8 +51,10 @@ export function ContactForm({ filiale = 'MACOF Holding', typeDemande = 'contact'
       } else {
         setFormStatus('error');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erreur formulaire:', err);
+      const backendMsg = err?.response?.data?.message;
+      setErrorMsg(backendMsg || '');
       setFormStatus('error');
     }
   };
@@ -84,8 +87,10 @@ export function ContactForm({ filiale = 'MACOF Holding', typeDemande = 'contact'
     return (
       <div className="bg-red-900/10 p-8 border border-red-500/30 rounded-sm text-center">
         <h3 className="text-2xl font-serif text-red-400 mb-4">Erreur lors de l'envoi</h3>
-        <p className="text-white/70 font-light mb-4">Une erreur est survenue. Veuillez réessayer.</p>
-        <Button variant="outline" className="text-white border-red-400 hover:bg-red-900 hover:text-white" onClick={() => setFormStatus('idle')}>Réessayer</Button>
+        <p className="text-white/70 font-light mb-4">
+          {errorMsg || 'Une erreur est survenue. Veuillez réessayer.'}
+        </p>
+        <Button variant="outline" className="text-white border-red-400 hover:bg-red-900 hover:text-white" onClick={() => { setFormStatus('idle'); setErrorMsg(''); }}>Réessayer</Button>
       </div>
     );
   }

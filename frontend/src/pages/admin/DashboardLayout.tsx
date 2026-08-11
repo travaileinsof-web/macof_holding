@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { ErrorBoundary } from '../../components/ui/ErrorBoundary';
 import { Outlet, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   LogOut,
   LayoutDashboard,
@@ -11,8 +13,12 @@ import {
   Settings,
   Menu,
   X,
+  BarChart3,
+  Users,
+  MessageSquareQuote,
+  Briefcase,
 } from 'lucide-react';
-import axios from 'axios';
+import { api } from '../../lib/api';
 
 interface AdminUser {
   name?: string;
@@ -29,8 +35,12 @@ const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
   { label: 'Demandes', icon: Mail, path: '/admin/demandes' },
   { label: 'Filiales', icon: Building2, path: '/admin/filiales' },
+  { label: 'Réalisations', icon: Briefcase, path: '/admin/realisations' },
   { label: 'Galerie', icon: Image, path: '/admin/galerie' },
   { label: 'Catalogues', icon: FileText, path: '/admin/catalogues' },
+  { label: 'Chiffres & Stats', icon: BarChart3, path: '/admin/stats' },
+  { label: 'Partenaires', icon: Users, path: '/admin/partenaires' },
+  { label: 'Témoignages', icon: MessageSquareQuote, path: '/admin/temoignages' },
   { label: 'Contenus', icon: FileEdit, path: '/admin/pages' },
   { label: 'Paramètres', icon: Settings, path: '/admin/settings' },
 ];
@@ -39,19 +49,26 @@ const pageTitles: Record<string, string> = {
   '/admin/dashboard': 'Dashboard',
   '/admin/demandes': 'Demandes',
   '/admin/filiales': 'Filiales',
+  '/admin/realisations': 'R\u00e9alisations par Filiale',
   '/admin/galerie': 'Galerie',
   '/admin/catalogues': 'Catalogues',
+  '/admin/stats': 'Chiffres & Statistiques',
+  '/admin/partenaires': 'Partenaires',
+  '/admin/temoignages': 'Témoignages Clients',
   '/admin/pages': 'Contenus',
   '/admin/settings': 'Paramètres',
 };
 
 export default function DashboardLayout() {
-  const token = localStorage.getItem('admin_token');
+  // Read token once on mount; do NOT re-read on every render. This prevents the
+  // layout from suddenly redirecting when a 401 interceptor clears localStorage
+  // mid-session (e.g. during a transient server restart). The dedicated 401
+  // interceptor in lib/api.ts handles logout navigation.
+  const [token] = useState(() => localStorage.getItem('admin_token'));
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser>({});
-  const [badges, setBadges] = useState<Record<string, number>>({});
 
   useEffect(() => {
     try {
@@ -64,26 +81,24 @@ export default function DashboardLayout() {
     }
   }, []);
 
-  useEffect(() => {
-    if (!token) return;
-    const fetchBadgeCounts = async () => {
+  const { data: badges = {} } = useQuery({
+    queryKey: ['dashboardBadges'],
+    queryFn: async () => {
+      if (!token) return {};
       try {
-        const response = await axios.get('/api/v1/admin/demandes', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await api.get('/api/v1/admin/stats');
         if (response.data.success) {
-          const demandes: Array<{ statut: string }> = response.data.data || [];
-          const nouveauCount = demandes.filter((d) => d.statut === 'nouveau').length;
-          setBadges({ '/admin/demandes': nouveauCount });
+          const nouveauCount = response.data.data?.nouvelles_demandes ?? 0;
+          return { '/admin/demandes': nouveauCount };
         }
       } catch {
         // ignore
       }
-    };
-    fetchBadgeCounts();
-    const interval = setInterval(fetchBadgeCounts, 15000);
-    return () => clearInterval(interval);
-  }, [token]);
+      return {};
+    },
+    enabled: !!token,
+    
+  });
 
   if (!token) {
     return <Navigate to="/admin/login" replace />;
@@ -195,7 +210,9 @@ export default function DashboardLayout() {
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-6">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

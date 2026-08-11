@@ -1,209 +1,178 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { AnimatedPage } from '../components/layout/AnimatedPage';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { DEFAULT_FALLBACK_IMAGE } from '../lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const FALLBACK_DOMAINES = [
   {
-    id: '01', title: "MACOF Immobilier", subtitle: "Immobilier & BTP", desc: "Investissement immobilier, promotion, construction, travaux publics, infrastructures.", details: ["Promotion immobilière", "Construction", "Travaux publics", "Gestion locative"], link: "/immobilier", img: "/plaquette-construction.jpeg"
+    id: '01', title: "MACOF Immobilier SARL", subtitle: "Immobilier & BTP", desc: "Investissement immobilier, promotion foncière, construction de bâtiments et gestion de chantiers publics/privés de grande envergure.", details: ["Promotion immobilière", "Travaux publics", "Architecture urbaine", "Gestion locative"], link: "/immobilier", img: "https://images.unsplash.com/photo-1541888081119-74d156828551?q=80&w=2070&auto=format&fit=crop"
   },
   {
-    id: '02', title: "MACOF Restauration", subtitle: "Restauration & Traiteur", desc: "Restauration premium, collective, événementielle, boulangerie-pâtisserie à travers les Restaurants SEBA International.", details: ["Restauration premium", "Restauration collective", "Service traiteur", "Boulangerie-pâtisserie"], link: "/restauration", img: "/plaquette-resto.jpeg"
+    id: '02', title: "SEBA International", subtitle: "Restauration & Gastronomie", desc: "Service traiteur premium, restauration d'entreprise et événementielle de très haut niveau, soutenue par une exigence stricte de qualité et de sécurité alimentaire.", details: ["Service Traiteur VIP", "Boulangerie & Pâtisserie", "Restauration Collective", "Événementiel Gastronomique"], link: "/restauration", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2070&auto=format&fit=crop"
   },
   {
-    id: '03', title: "MACOF Print & Com", subtitle: "Communication & Impression", desc: "Impression, identité visuelle, signalétique, organisation de grands événements.", details: ["Impression offset & numérique", "Identité visuelle", "Signalétique", "Événementiel"], link: "/print", img: "/plaquette-print.jpeg"
+    id: '03', title: "MACOF Print & Com SARL", subtitle: "Design & Imprimerie", desc: "Agence créative spécialisée dans la stratégie de marque, l'impression grand format, la création d'identités visuelles et l'événementiel d'entreprise.", details: ["Impression Numérique/Offset", "Identité Visuelle", "Signalétique", "Organisation d'événements"], link: "/print", img: "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?q=80&w=2070&auto=format&fit=crop"
   },
   {
-    id: '04', title: "MACOF Mining", subtitle: "Activités minières", desc: "Exploration, exploitation, sous-traitance, transport et commercialisation de produits miniers.", details: ["Exploration minière", "Exploitation", "Sous-traitance", "Transport minier"], link: "/mining", img: "/plaquette-mining.jpeg"
+    id: '04', title: "MACOF Mining SARL", subtitle: "Industrie Minière", desc: "Opérations d'exploration, exploitation responsable, transport spécialisé et sous-traitance dans le secteur minier guinéen.", details: ["Exploration", "Exploitation responsable", "Logistique minière", "Sous-traitance"], link: "/mining", img: "https://images.unsplash.com/photo-1578507005479-7a0808a3d666?q=80&w=2070&auto=format&fit=crop"
   },
   {
-    id: '05', title: "MACOF Transit", subtitle: "Transit, Logistique & Voyages", desc: "Dédouanement, transport national et international, logistique, import-export, billetterie.", details: ["Dédouanement", "Fret maritime & aérien", "Logistique", "Billetterie voyage"], link: "/transit", img: "/plaquette-logistics.jpeg"
+    id: '05', title: "MACOF Transit SARL", subtitle: "Logistique Globale", desc: "Maîtrise de bout en bout de la chaîne d'approvisionnement : fret maritime et aérien, dédouanement et service de billetterie d'affaires.", details: ["Dédouanement expert", "Fret International", "Supply Chain", "Billetterie d'affaires"], link: "/transit", img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop"
   },
   {
-    id: '06', title: "MACOF Fishing", subtitle: "Pêche & Ressources", desc: "Pêche artisanale et industrielle, transformation, conservation et distribution de produits de la mer.", details: ["Pêche artisanale & industrielle", "Transformation & conservation", "Commercialisation", "Export"], link: "/fishing", img: "/plaquette-fishing.jpeg"
+    id: '06', title: "MACOF Fishing SARL", subtitle: "Pêche & Halieutique", desc: "Exploitation durable des ressources marines, transformation certifiée et commercialisation de produits de la mer sur les marchés locaux et internationaux.", details: ["Pêche industrielle", "Transformation", "Conservation frigorifique", "Distribution globale"], link: "/fishing", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=2070&auto=format&fit=crop"
   }
 ];
 
 export default function Domaines() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [domaines, setDomaines] = useState<any[]>([]);
 
-  useEffect(() => {
-    axios.get('/api/v1/filiales')
-      .then(res => {
-        if (res.data.success) {
-          if (res.data.data && res.data.data.length > 0) {
-            const formatted = res.data.data.map((f: any, i: number) => {
-              let parsedDetails: any[] = [];
-              if (f.details_json) {
-                try {
-                  parsedDetails = typeof f.details_json === 'string' ? JSON.parse(f.details_json) : f.details_json;
-                  if (!Array.isArray(parsedDetails)) parsedDetails = [];
-                } catch (e) {
-                  parsedDetails = [];
-                }
-              }
-
-              const routeMap: Record<string, string> = {
-                'MACOF Immobilier': '/immobilier',
-                'MACOF Restauration': '/restauration',
-                'MACOF Print & Com': '/print',
-                'MACOF Mining': '/mining',
-                'MACOF Transit': '/transit',
-                'MACOF Fishing': '/fishing'
-              };
-
-              return {
-                id: String(i + 1).padStart(2, '0'),
-                title: f.nom,
-                subtitle: f.secteur || 'Pôle d\'expertise',
-                desc: f.description,
-                details: parsedDetails,
-                link: routeMap[f.nom] || '/domaines',
-                img: f.image_path ? `${f.image_path}` : "/plaquette-building.jpeg"
-              };
-            });
-            setDomaines(formatted);
-          } else {
-            setDomaines(FALLBACK_DOMAINES);
-          }
-        }
-      })
-      .catch(err => {
-        console.error("Erreur de chargement des filiales", err);
-        setDomaines(FALLBACK_DOMAINES);
-      });
-  }, []);
-
-  // Polling for real-time data sync
-  useEffect(() => {
-    const pollInterval = setInterval(async () => {
+  const { data: domaines = [] } = useQuery({
+    queryKey: ['domainesData'],
+    queryFn: async () => {
       try {
         const res = await axios.get('/api/v1/filiales');
-        if (res.data.success) setDomaines(res.data.data);
-      } catch (e) { /* silently ignore polling errors */ }
-    }, 30000);
-    return () => clearInterval(pollInterval);
-  }, []);
+        if (res.data.success && res.data.data && res.data.data.length > 0) {
+          const apiData = res.data.data;
+          // Iterate over FALLBACK_DOMAINES to maintain strict 01-06 order
+          return FALLBACK_DOMAINES.map((fallback, index) => {
+            // Try to find the matching API item by slug or title prefix
+            const f = apiData.find((apiItem: any) => {
+              const itemSlug = apiItem.slug?.toLowerCase().replace('macof-', '').replace('seba-', '');
+              const fbSlug = fallback.link.replace('/', '').toLowerCase();
+              return itemSlug === fbSlug;
+            });
+            
+            if (f) {
+              const apiImg = f.image_url || f.image_path;
+              const finalImg = apiImg ? (apiImg.startsWith('http') || apiImg.startsWith('/') ? apiImg : `/uploads/${apiImg}`) : fallback.img;
+              
+              return {
+                id: fallback.id,
+                title: f.nom || fallback.title,
+                subtitle: f.secteur || fallback.subtitle,
+                desc: f.description || fallback.desc,
+                details: fallback.details, // Force rich details from fallback
+                link: fallback.link, // Keep fallback link to ensure routing works
+                img: finalImg,
+                fallbackImg: fallback.img
+              };
+            }
+            return { ...fallback, fallbackImg: fallback.img };
+          });
+        }
+      } catch (err) {
+        console.warn("Erreur API filiales, chargement du fallback en dur.");
+      }
+      return FALLBACK_DOMAINES;
+    },
+    
+  });
 
   useEffect(() => {
     if (domaines.length > 0) {
-    const ctx = gsap.context(() => {
-      // Reveal animations for each domain block
-      gsap.utils.toArray('.domain-block').forEach((block: any) => {
-        const textContent = block.querySelector('.text-content');
-        const imgContent = block.querySelector('.img-content');
-        
-        gsap.from(textContent, {
-          y: 50,
-          opacity: 0,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: block,
-            start: "top 75%",
-          }
-        });
+      const ctx = gsap.context(() => {
+        gsap.utils.toArray('.domain-block').forEach((block: any) => {
+          const textContent = block.querySelector('.text-content');
+          const imgContent = block.querySelector('.img-content');
+          
+          gsap.fromTo(textContent, 
+            { y: 50, opacity: 0 },
+            { y: 0, opacity: 1, duration: 1.2, ease: "power3.out", scrollTrigger: { trigger: block, start: "top 75%" } }
+          );
 
-        gsap.from(imgContent, {
-          scale: 0.95,
-          opacity: 0,
-          duration: 1.5,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: block,
-            start: "top 80%",
-          }
+          gsap.fromTo(imgContent, 
+            { scale: 0.95, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 1.5, ease: "power3.out", scrollTrigger: { trigger: block, start: "top 80%" } }
+          );
         });
-      });
-    }, containerRef);
-    return () => ctx.revert();
+      }, containerRef);
+      return () => ctx.revert();
     }
   }, [domaines]);
 
   return (
-    <AnimatedPage className="bg-background">
+    <AnimatedPage className="bg-white">
       <div ref={containerRef}>
         
-        {/* Header Ultra-Luxe */}
-        <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+        {/* Header Institutionnel */}
+        <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden bg-gray-900">
           <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-blue-950/80 z-10" />
-            <img 
-              src="/plaquette-banner.jpeg"
-              alt="Pôles d'expertise" 
-              className="w-full h-full object-cover filter grayscale-[30%]" 
+            <div className="absolute inset-0 bg-black/60 z-10" />
+            <img
+              src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2070&auto=format&fit=crop"
+              alt="Pôles d'expertise"
+              className="w-full h-full object-cover filter grayscale-[30%] opacity-70" 
             />
           </div>
-          <div className="relative z-20 text-center px-4 max-w-5xl mt-20">
-            <h1 className="text-6xl md:text-8xl font-serif text-white mb-6 font-light">
-              Nos Pôles <br/><span className="text-gradient-corporate italic">d'Expertise</span>
+          <div className="relative z-20 text-center px-6 max-w-4xl mt-20">
+            <p className="text-red-500 text-xs uppercase tracking-[0.4em] font-sans mb-6 font-semibold">Portefeuille du Groupe</p>
+            <h1 className="text-5xl md:text-7xl font-serif text-white mb-8 font-light">
+              Nos Domaines <br/><span className="text-red-500 italic">d'Intervention</span>
             </h1>
-            <p className="text-xl text-white font-light font-sans max-w-2xl mx-auto leading-relaxed mt-8">
-              Une galaxie de six filiales indépendantes et complémentaires, unies par la même exigence de perfection pour façonner l'économie guinéenne de demain.
+            <p className="text-lg text-gray-300 font-light font-sans max-w-2xl mx-auto leading-relaxed border-t border-white/20 pt-8">
+              Une spécialisation sectorielle pour une expertise de pointe. Découvrez les six filiales indépendantes qui constituent la force de frappe de MACOF Holding.
             </p>
           </div>
         </section>
 
-        {/* Liste détaillée des domaines (Sticky / Alternating Layout) */}
-        <section className="py-24 bg-background">
-          <div className="max-w-[100rem] mx-auto px-6 lg:px-12 space-y-32">
-            {domaines.length === 0 && (
-              <div className="text-center py-20 text-muted-foreground">
-                <p className="text-xl">Aucun domaine trouvé</p>
-              </div>
-            )}
+        {/* Grille Dynamique / Liste Détaillée */}
+        <section className="py-32 bg-white">
+          <div className="max-w-[90rem] mx-auto px-6 lg:px-12 space-y-32">
             {domaines.map((domaine, index) => {
               const isEven = index % 2 === 0;
               return (
                 <div key={domaine.id} className={`domain-block flex flex-col lg:flex-row gap-16 items-center ${isEven ? '' : 'lg:flex-row-reverse'}`}>
                   
-                  {/* Image Side */}
-                  <div className="img-content w-full lg:w-1/2 relative">
-                    <div className="absolute -inset-4 bg-primary/10 blur-2xl rounded-full z-0 pointer-events-none" />
-                    <div className="relative z-10 aspect-[4/3] overflow-hidden border border-white/10 group">
+                  {/* Image Block */}
+                  <div className="img-content w-full lg:w-[55%] relative group">
+                    <div className="absolute inset-0 bg-blue-900/5 -translate-x-4 translate-y-4 md:-translate-x-6 md:translate-y-6 z-0 rounded" />
+                    <div className="relative z-10 aspect-[4/3] overflow-hidden border border-gray-200 bg-gray-100 shadow-xl">
                       <img 
                         src={domaine.img} 
                         alt={domaine.title} 
-                        className="w-full h-full object-cover filter grayscale-[20%] group-hover:grayscale-0 transform group-hover:scale-105 transition-all duration-[2s] ease-out" 
+                        className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-[2s] ease-out" 
+                        onError={(e) => { e.currentTarget.src = domaine.fallbackImg || DEFAULT_FALLBACK_IMAGE; }}
                       />
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700" />
                     </div>
                   </div>
 
-                  {/* Text Side */}
-                  <div className="text-content w-full lg:w-1/2 relative">
-                    {/* Big Background Number */}
-                    <div className="absolute -top-24 -left-12 text-[12rem] font-serif font-black text-white/[0.03] select-none pointer-events-none leading-none z-0">
+                  {/* Text Block */}
+                  <div className="text-content w-full lg:w-[45%] relative z-20">
+                    <div className="absolute -top-16 -left-8 text-[10rem] font-serif font-black text-gray-100 select-none pointer-events-none leading-none z-0">
                       {domaine.id}
                     </div>
                     
-                    <div className="relative z-10 pl-0 lg:pl-8">
-                      <span className="text-sm font-sans tracking-[0.3em] text-primary uppercase mb-4 block">Pôle {domaine.id}</span>
-                      <h2 className="text-4xl md:text-5xl font-serif text-white mb-4">{domaine.title}</h2>
-                      <h3 className="text-xl font-serif text-white/50 mb-8 italic">{domaine.subtitle}</h3>
+                    <div className="relative z-10">
+                      <span className="text-xs font-sans tracking-[0.3em] text-red-600 uppercase mb-4 block font-semibold flex items-center gap-3">
+                        <span className="w-8 h-[2px] bg-red-600"></span>
+                        {domaine.subtitle}
+                      </span>
+                      <h2 className="text-4xl md:text-5xl font-serif text-gray-900 mb-8">{domaine.title}</h2>
                       
-                      <p className="text-white/80 font-light leading-relaxed mb-8 text-lg">
+                      <p className="text-gray-600 font-light leading-relaxed mb-10 text-lg">
                         {domaine.desc}
                       </p>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                        {domaine.details.map((detail, idx) => (
-                          <div key={idx} className="flex items-center gap-3">
-                            <span className="text-primary text-xs">◈</span>
-                            <span className="text-white font-light text-sm tracking-wide">{detail}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-12">
+                        {domaine.details.map((detail: string, idx: number) => (
+                          <div key={idx} className="flex items-center gap-3 border-b border-gray-100 pb-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-900"></div>
+                            <span className="text-gray-800 font-medium text-sm">{detail}</span>
                           </div>
                         ))}
                       </div>
 
                       <Link to={domaine.link}>
-                        <Button variant="outline" className="text-white border-white/30 hover:border-white hover:bg-white hover:text-black transition-all">
-                          Découvrir la filiale
+                        <Button variant="luxury" className="bg-gray-900 text-white hover:bg-red-600 transition-colors px-8 py-6 rounded-none shadow-none text-sm tracking-widest uppercase">
+                          Explorer cette expertise
                         </Button>
                       </Link>
                     </div>
@@ -212,25 +181,6 @@ export default function Domaines() {
                 </div>
               );
             })}
-          </div>
-        </section>
-
-        {/* CTA Bottom */}
-        <section className="py-32 bg-primary relative overflow-hidden">
-          <div className="absolute inset-0 z-0 opacity-20">
-             <img src="/plaquette-banner.jpeg" className="w-full h-full object-cover" alt="MACOF Holding" />
-             <div className="absolute inset-0 bg-primary/80" />
-          </div>
-          <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
-            <h2 className="text-4xl md:text-6xl font-serif text-white mb-8">Un Projet Multidisciplinaire ?</h2>
-            <p className="text-white/90 font-light mb-12 text-xl leading-relaxed">
-              La force de MACOF Holding réside dans la synergie de ses pôles. Confiez-nous vos projets d'envergure, nous déploierons notre expertise transversale pour en garantir le succès.
-            </p>
-            <Link to="/contact">
-              <Button variant="luxury" size="lg" className="bg-white text-primary hover:bg-gray-100 shadow-2xl px-12">
-                Consulter la Direction Générale
-              </Button>
-            </Link>
           </div>
         </section>
 

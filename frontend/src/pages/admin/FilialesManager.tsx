@@ -9,7 +9,8 @@ import {
   Edit2,
   Building2,
 } from 'lucide-react';
-import axios from 'axios';
+import { api } from '../../lib/api';
+import { AdminPage } from '../../components/ui/AdminPage';
 
 interface Filiale {
   id: number;
@@ -18,7 +19,7 @@ interface Filiale {
   secteur: string;
   description: string;
   image_url: string;
-  details: string[];
+  details_json?: { items?: string[] } | string[] | null;
   email: string;
   telephone: string;
   adresse: string;
@@ -26,15 +27,6 @@ interface Filiale {
   statut: string;
   created_at: string;
 }
-
-const api = axios.create();
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 const emptyForm = {
   nom: '',
@@ -89,9 +81,9 @@ export default function FilialesManager() {
   const filteredFiliales = filiales.filter((f) => {
     return (
       !search ||
-      f.nom.toLowerCase().includes(search.toLowerCase()) ||
-      f.slug.toLowerCase().includes(search.toLowerCase()) ||
-      f.secteur.toLowerCase().includes(search.toLowerCase())
+      (f.nom || '').toLowerCase().includes(search.toLowerCase()) ||
+      (f.slug || '').toLowerCase().includes(search.toLowerCase()) ||
+      (f.secteur || '').toLowerCase().includes(search.toLowerCase())
     );
   });
 
@@ -123,12 +115,21 @@ export default function FilialesManager() {
 
   const openEditModal = (filiale: Filiale) => {
     setEditId(filiale.id);
+    // Normalize details_json ({items:[...]} | string[] | null) → newline string
+    let detailsStr = '';
+    const dj = filiale.details_json;
+    if (dj) {
+      let arr: string[] = [];
+      if (Array.isArray(dj)) arr = dj;
+      else if (Array.isArray((dj as any).items)) arr = (dj as any).items;
+      detailsStr = arr.join('\n');
+    }
     setForm({
       nom: filiale.nom,
       slug: filiale.slug,
       secteur: filiale.secteur || '',
       description: filiale.description || '',
-      details: Array.isArray(filiale.details) ? filiale.details.join('\n') : '',
+      details: detailsStr,
       email: filiale.email || '',
       telephone: filiale.telephone || '',
       adresse: filiale.adresse || '',
@@ -188,8 +189,9 @@ export default function FilialesManager() {
     try {
       await api.delete(`/api/v1/admin/filiales/${id}`);
       fetchData();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erreur suppression:', err);
+      alert(err?.response?.data?.message || 'Erreur lors de la suppression.');
     }
   };
 
@@ -217,15 +219,9 @@ export default function FilialesManager() {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 text-[#cda434] animate-spin" />
-      </div>
-    );
-  }
 
   return (
+    <AdminPage loading={loading}>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -467,5 +463,6 @@ export default function FilialesManager() {
         </div>
       )}
     </div>
+    </AdminPage>
   );
 }

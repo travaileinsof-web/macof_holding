@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState , useMemo } from 'react';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { MessageCircle, Ship, Plane, Truck, FileCheck, Globe2, Ticket } from 'lucide-react';
+import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -39,34 +39,45 @@ export default function Transit() {
   const [whatsappUrl, setWhatsappUrl] = useState('');
   const [activeTab, setActiveTab] = useState<'logistique' | 'travel'>('logistique');
 
+  const { data: filialeData } = useQuery({
+    queryKey: ['filialeData', SLUG],
+    queryFn: async () => {
+      try {
+        const res = await axios.get(`/api/v1/filiales/${SLUG}`);
+        if (res.data.success) return res.data.data;
+      } catch (e) {
+        console.warn('API Error filiale');
+      }
+      return null;
+    },
+    
+  });
+
   const { data: content, isLoading: loading } = useQuery({
     queryKey: ['pageContent', SLUG],
     queryFn: async () => {
       try {
         const res = await axios.get(`/api/v1/pages/${SLUG}`);
-        if (res.data.success && res.data.data) return res.data.data;
+        if (res.data.success && res.data.data) return mergeContent(fallbackContent, res.data.data);
       } catch (err) {
         console.warn('API Error');
       }
-      return null;
+      return fallbackContent;
     },
-    refetchInterval: 30000,
+    
   });
 
-  const { data: realisations = [] } = useQuery({
-    queryKey: ['galerie', 'macof-transit'],
-    queryFn: async () => {
+  const realisations = useMemo(() => {
+    if (content?.realisations) {
       try {
-        const res = await axios.get('/api/v1/galerie?filiale=macof-transit&limit=6');
-        if (res.data.success) {
-          return Array.isArray(res.data.data) ? res.data.data : (res.data.data?.items || []);
-        }
-      } catch (err) {
-        console.warn('API Error');
+        const parsed = typeof content.realisations === 'string' ? JSON.parse(content.realisations) : content.realisations;
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        console.warn('Error parsing realisations JSON');
       }
-      return [];
-    },
-  });
+    }
+    return [];
+  }, [content?.realisations]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +96,16 @@ export default function Transit() {
     }
   };
 
-  const services = content?.services ? JSON.parse(content.services) : fallbackServices;
+  // Force fallbackServices to display the rich text if DB items lack descriptions
+  let services = fallbackServices;
+  if (content?.services) {
+    try {
+      const parsed = JSON.parse(content.services);
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].desc) {
+        services = parsed;
+      }
+    } catch(e) {}
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -123,17 +143,17 @@ export default function Transit() {
             />
           </div>
           <div className="relative z-20 w-full max-w-7xl mx-auto px-6 lg:px-12 mt-20 text-center fade-up">
-            <h2 className="text-[#C4A47C] text-sm uppercase tracking-[0.4em] font-semibold mb-6">
+            <h2 className="text-red-600 text-sm uppercase tracking-[0.4em] font-semibold mb-6">
               {content?.hero_subtitle || fallbackContent.hero_subtitle}
             </h2>
             <h1 className="text-6xl md:text-8xl font-serif text-white mb-8 font-bold uppercase tracking-tight">
-              Global <span className="text-[#C4A47C]">Supply Chain.</span>
+              Global <span className="text-red-600">Supply Chain.</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 font-light max-w-3xl mx-auto leading-relaxed mb-10">
               {content?.hero_desc || fallbackContent.hero_desc}
             </p>
             <div className="flex flex-wrap justify-center gap-6">
-              <Button variant="luxury" size="lg" className="bg-[#C4A47C] text-black hover:bg-white transition-colors duration-500 rounded-none px-8">
+              <Button variant="luxury" size="lg" className="bg-red-600 text-white hover:bg-white hover:text-black transition-colors duration-500 rounded-none px-8">
                 Demander une cotation
               </Button>
             </div>
@@ -163,14 +183,14 @@ export default function Transit() {
             
             <div className="grid grid-cols-1 gap-6 fade-up">
               <div className="bg-gray-50 p-10 border border-gray-100 flex items-center gap-6 group hover:bg-[#111111] transition-colors duration-500">
-                <Globe2 size={48} strokeWidth={1} className="text-red-600 group-hover:text-[#C4A47C] transition-colors" />
+                <Globe2 size={48} strokeWidth={1} className="text-red-600 group-hover:text-red-500 transition-colors" />
                 <div>
                   <h4 className="font-serif text-2xl text-gray-900 group-hover:text-white transition-colors mb-2">Transit & Logistique</h4>
                   <p className="text-gray-500 group-hover:text-gray-400 font-light transition-colors">Import/Export, Douane, Fret</p>
                 </div>
               </div>
               <div className="bg-gray-50 p-10 border border-gray-100 flex items-center gap-6 group hover:bg-[#111111] transition-colors duration-500">
-                <Ticket size={48} strokeWidth={1} className="text-red-600 group-hover:text-[#C4A47C] transition-colors" />
+                <Ticket size={48} strokeWidth={1} className="text-red-600 group-hover:text-red-500 transition-colors" />
                 <div>
                   <h4 className="font-serif text-2xl text-gray-900 group-hover:text-white transition-colors mb-2">Agence de Voyages</h4>
                   <p className="text-gray-500 group-hover:text-gray-400 font-light transition-colors">Billetterie, Visas, B2B Travel</p>
@@ -185,17 +205,17 @@ export default function Transit() {
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
               <div className="flow-right">
-                <div className="text-4xl font-serif text-[#C4A47C] mb-4 font-bold">01</div>
+                <div className="text-4xl font-serif text-red-600 mb-4 font-bold">01</div>
                 <h4 className="text-xl font-bold mb-4 font-serif">Fiabilité & Rapidité</h4>
                 <p className="text-gray-400 font-light">Circuit de dédouanement accéléré grâce à notre intégration avec les systèmes douaniers (SYDONIA).</p>
               </div>
               <div className="fade-up">
-                <div className="text-4xl font-serif text-[#C4A47C] mb-4 font-bold">02</div>
+                <div className="text-4xl font-serif text-red-600 mb-4 font-bold">02</div>
                 <h4 className="text-xl font-bold mb-4 font-serif">Conformité Légale</h4>
                 <p className="text-gray-400 font-light">Expertise avérée en classification tarifaire et régimes douaniers particuliers. Zéro risque de contentieux.</p>
               </div>
               <div className="flow-left">
-                <div className="text-4xl font-serif text-[#C4A47C] mb-4 font-bold">03</div>
+                <div className="text-4xl font-serif text-red-600 mb-4 font-bold">03</div>
                 <h4 className="text-xl font-bold mb-4 font-serif">Tracking Temps Réel</h4>
                 <p className="text-gray-400 font-light">Visibilité de bout en bout sur l'acheminement de vos cargaisons, du port d'embarquement jusqu'à vos entrepôts.</p>
               </div>
@@ -210,13 +230,13 @@ export default function Transit() {
               <div className="bg-white p-1 shadow-sm border border-gray-200 inline-flex">
                 <button 
                   onClick={() => setActiveTab('logistique')}
-                  className={`px-8 py-3 text-sm font-semibold tracking-widest uppercase transition-all ${activeTab === 'logistique' ? 'bg-[#111111] text-[#C4A47C]' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`px-8 py-3 text-sm font-semibold tracking-widest uppercase transition-all ${activeTab === 'logistique' ? 'bg-[#111111] text-red-600' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   Transit & Logistique
                 </button>
                 <button 
                   onClick={() => setActiveTab('travel')}
-                  className={`px-8 py-3 text-sm font-semibold tracking-widest uppercase transition-all ${activeTab === 'travel' ? 'bg-[#111111] text-[#C4A47C]' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`px-8 py-3 text-sm font-semibold tracking-widest uppercase transition-all ${activeTab === 'travel' ? 'bg-[#111111] text-red-600' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                   MACOF Travel
                 </button>
@@ -227,11 +247,11 @@ export default function Transit() {
               {activeTab === 'logistique' ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 w-full animate-in fade-in duration-500">
                   <div className="p-12 lg:p-16 flex flex-col justify-center bg-[#111111] text-white">
-                    <h3 className="text-3xl md:text-5xl font-serif text-white mb-8">Solutions <span className="text-[#C4A47C] italic">Logistiques.</span></h3>
+                    <h3 className="text-3xl md:text-5xl font-serif text-white mb-8">Solutions <span className="text-red-600 italic">Logistiques.</span></h3>
                     <div className="space-y-8">
                       {services.map((serv: any, i: number) => (
                         <div key={i} className="flex gap-6 items-start">
-                          <div className="w-14 h-14 border border-[#C4A47C]/30 text-[#C4A47C] flex items-center justify-center flex-shrink-0">
+                          <div className="w-14 h-14 border border-red-600/30 text-red-600 flex items-center justify-center flex-shrink-0">
                             {serv.icon}
                           </div>
                           <div>
@@ -261,14 +281,14 @@ export default function Transit() {
                     </p>
                     <div className="space-y-8">
                       <div className="flex gap-6 items-start">
-                        <div className="w-14 h-14 border border-[#C4A47C]/30 text-[#C4A47C] flex items-center justify-center flex-shrink-0"><Plane size={24} /></div>
+                        <div className="w-14 h-14 border border-red-600/30 text-red-600 flex items-center justify-center flex-shrink-0"><Plane size={24} /></div>
                         <div>
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Billetterie Aérienne</h4>
                           <p className="text-gray-500 font-light">Réservation et émission de billets sur toutes les compagnies régionales et internationales.</p>
                         </div>
                       </div>
                       <div className="flex gap-6 items-start">
-                        <div className="w-14 h-14 border border-[#C4A47C]/30 text-[#C4A47C] flex items-center justify-center flex-shrink-0"><FileCheck size={24} /></div>
+                        <div className="w-14 h-14 border border-red-600/30 text-red-600 flex items-center justify-center flex-shrink-0"><FileCheck size={24} /></div>
                         <div>
                           <h4 className="text-xl font-bold text-gray-900 mb-2">Assistance Administrative</h4>
                           <p className="text-gray-500 font-light">Facilitation d'obtention de visas, assurances voyage et réservations hôtelières à travers le monde.</p>
@@ -297,7 +317,7 @@ export default function Transit() {
           <section className="py-32 bg-white">
             <div className="max-w-[100rem] mx-auto px-6 lg:px-12 fade-up">
               <div className="text-center mb-16">
-                <h2 className="text-sm font-sans tracking-[0.2em] text-[#C4A47C] uppercase mb-4 font-bold">Infrastructures</h2>
+                <h2 className="text-sm font-sans tracking-[0.2em] text-red-600 uppercase mb-4 font-bold">Infrastructures</h2>
                 <h3 className="text-4xl md:text-5xl font-serif text-gray-900">En Immersion <span className="italic text-gray-500">Opérationnelle</span></h3>
               </div>
               
@@ -311,7 +331,7 @@ export default function Transit() {
                       onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
                     />
                     <div className="absolute inset-0 bg-[#111111]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8 text-center items-center backdrop-blur-sm">
-                      <span className="text-[#C4A47C] text-xs font-sans tracking-widest uppercase mb-3 font-bold">{item.type_projet || 'Logistique'}</span>
+                      <span className="text-red-600 text-xs font-sans tracking-widest uppercase mb-3 font-bold">{item.type_projet || 'Logistique'}</span>
                       <h4 className="text-white text-2xl font-serif">{item.titre}</h4>
                     </div>
                   </div>
@@ -329,14 +349,14 @@ export default function Transit() {
           <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start fade-up">
               <div>
-                <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Cotation Logistique <br/><span className="text-[#C4A47C] italic">Express.</span></h2>
+                <h2 className="text-4xl md:text-5xl font-serif text-white mb-6">Cotation Logistique <br/><span className="text-red-600 italic">Express.</span></h2>
                 <p className="text-gray-400 font-light max-w-md mb-12 text-lg">
                   Décrivez les spécificités de votre expédition. Nos experts cotateurs vous fourniront une solution optimisée sous 24h.
                 </p>
                 <div className="bg-white/5 p-8 border border-white/10 backdrop-blur-md">
-                  <h4 className="text-xl font-serif text-white mb-6 flex items-center gap-3"><MessageCircle className="text-[#C4A47C]"/> Contact Transit</h4>
-                  <p className="text-gray-400 font-light text-sm mb-3">Email: {content?.contact_email || fallbackContent.contact_email}</p>
-                  <p className="text-gray-400 font-light text-sm mb-3">Téléphone: {content?.contact_phone || fallbackContent.contact_phone}</p>
+                  <h4 className="text-xl font-serif text-white mb-6 flex items-center gap-3"><MessageCircle className="text-red-600"/> Contact Transit</h4>
+                  <p className="text-gray-400 font-light text-sm mb-3">Email: {filialeData?.email || content?.contact_email || fallbackContent.contact_email}</p>
+                  <p className="text-gray-400 font-light text-sm mb-3">Téléphone: {filialeData?.telephone || content?.contact_phone || fallbackContent.contact_phone}</p>
                   <p className="text-gray-400 font-light text-sm">Adresse : Manquepa, Kaloum, Conakry</p>
                 </div>
               </div>
@@ -363,29 +383,29 @@ export default function Transit() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Société</label>
-                        <Input required placeholder="Votre entreprise" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-[#C4A47C]" />
+                        <Input required placeholder="Votre entreprise" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-red-600" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Email pro</label>
-                        <Input required type="email" placeholder="contact@..." className="bg-gray-50 border-gray-200 focus:bg-white focus:border-[#C4A47C]" />
+                        <Input required type="email" placeholder="contact@..." className="bg-gray-50 border-gray-200 focus:bg-white focus:border-red-600" />
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Port/Aéroport de Départ</label>
-                        <Input required placeholder="Ex: Shanghai (CNSHA)" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-[#C4A47C]" />
+                        <Input required placeholder="Ex: Shanghai (CNSHA)" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-red-600" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Destination</label>
-                        <Input required placeholder="Ex: Conakry (GNCKY)" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-[#C4A47C]" />
+                        <Input required placeholder="Ex: Conakry (GNCKY)" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-red-600" />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Incoterm</label>
-                        <select className="flex h-11 w-full border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:bg-white focus:border-[#C4A47C]">
+                        <select className="flex h-11 w-full border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:bg-white focus:border-red-600">
                           <option>FOB</option>
                           <option>CIF</option>
                           <option>EXW</option>
@@ -394,11 +414,11 @@ export default function Transit() {
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Volume (CBM/EVP)</label>
-                        <Input placeholder="Ex: 1x 40' HC" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-[#C4A47C]" />
+                        <Input placeholder="Ex: 1x 40' HC" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-red-600" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Poids Brut</label>
-                        <Input placeholder="Ex: 24 T" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-[#C4A47C]" />
+                        <Input placeholder="Ex: 24 T" className="bg-gray-50 border-gray-200 focus:bg-white focus:border-red-600" />
                       </div>
                     </div>
 
@@ -407,12 +427,12 @@ export default function Transit() {
                       <textarea
                         required
                         rows={3}
-                        className="flex w-full border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:bg-white focus:border-[#C4A47C]"
+                        className="flex w-full border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:bg-white focus:border-red-600"
                         placeholder="Marchandise générale, périssable, classe OMI..."
                       />
                     </div>
                     
-                    <Button variant="luxury" size="lg" className="w-full bg-[#111111] text-white hover:bg-[#C4A47C] hover:text-black transition-colors duration-300 h-14 font-bold text-sm tracking-widest uppercase rounded-none" disabled={formStatus === 'loading'}>
+                    <Button variant="luxury" size="lg" className="w-full bg-[#111111] text-white hover:bg-red-600 hover:text-black transition-colors duration-300 h-14 font-bold text-sm tracking-widest uppercase rounded-none" disabled={formStatus === 'loading'}>
                       {formStatus === 'loading' ? 'Analyse...' : 'Obtenir une cotation'}
                     </Button>
                   </form>

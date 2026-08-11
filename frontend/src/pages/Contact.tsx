@@ -1,117 +1,201 @@
 import { AnimatedPage } from '../components/layout/AnimatedPage';
 import { ContactForm } from '../components/ContactForm';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { useSettings } from '../hooks/useSettings';
+import { MapPin, Phone, Mail, Clock, Building2, Globe2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+
+// Fallback data used if the CMS API is unavailable
+const FALLBACK = {
+  title: 'Lignes Directes',
+  subtitle: "Nos équipes dédiées sont à votre entière disposition pour répondre à vos demandes de partenariat, de cotation ou d'informations sur l'ensemble de nos pôles d'activités.",
+  siege_name: 'Siège MACOF Holding',
+  adresse: 'Manquepa en face de banc bleu\nKaloum, République de Guinée',
+  telephone: '+224 625 74 46 26 / 623 98 75 11',
+  email: 'macofholding2018@gmail.com',
+  horaires: 'Lundi - Vendredi : 08h00 - 18h00\nSamedi : 09h00 - 13h00',
+  map_label: 'Siège MACOF, Kaloum',
+  map_embed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15764.128795550267!2d-13.7153676!3d9.510001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMzAnMzYuMCJOIDEzwrA0MicyNS4zIlc!5e0!3m2!1sfr!2s!4v1600000000000!5m2!1sfr!2s',
+};
+
+const FALLBACK_FILIALES = [
+  { nom: 'MACOF Immobilier', slug: 'immobilier' },
+  { nom: 'MACOF Restauration', slug: 'restauration' },
+  { nom: 'MACOF Transit', slug: 'transit' },
+  { nom: 'MACOF Mining', slug: 'mining' },
+  { nom: 'MACOF Print & Com', slug: 'print' },
+  { nom: 'MACOF Fishing', slug: 'fishing' },
+];
 
 export default function Contact() {
+  const { data } = useQuery({
+    queryKey: ['contactData'],
+    queryFn: async () => {
+      try {
+        const [pageRes, filialesRes] = await Promise.all([
+          axios.get('/api/v1/pages/contact'),
+          axios.get('/api/v1/filiales'),
+        ]);
+        return {
+          content: pageRes.data.success ? pageRes.data.data : null,
+          filiales: filialesRes.data.success 
+            ? (Array.isArray(filialesRes.data.data) ? filialesRes.data.data : (filialesRes.data.data.items || []))
+            : []
+        };
+      } catch (err) {
+        console.warn("API Error contact");
+      }
+      return { content: null, filiales: [] };
+    },
+    
+  });
+
+  const { settings } = useSettings();
+
+  const c = data?.content || {};
+  const filialeList = data?.filiales?.length ? data.filiales : FALLBACK_FILIALES;
+
+  const adresse = c.adresse || settings.contact_address || FALLBACK.adresse;
+  const telephone = c.telephone || settings.contact_phone || FALLBACK.telephone;
+  const email = c.email || settings.contact_email || FALLBACK.email;
+  const horaires = c.horaires || FALLBACK.horaires;
+
   return (
-    <AnimatedPage className="bg-background pt-32 pb-24 min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <AnimatedPage className="bg-background min-h-screen">
+      
+      {/* Hero Contact */}
+      <section className="relative pt-32 pb-24 bg-[#0a0a0a] overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop')] bg-cover opacity-[0.08] mix-blend-screen mask-image-gradient-l" />
         
-        {/* En-tête */}
-        <div className="mb-20 text-center md:text-left">
-          <h1 className="text-5xl md:text-7xl font-serif text-white font-light mb-6">
-            Contactez <br/><span className="italic text-gradient-corporate">MACOF Holding</span>
-          </h1>
-          <p className="text-xl text-white/80 font-sans font-light max-w-2xl leading-relaxed">
-            Nos équipes dédiées sont à votre entière disposition pour répondre à vos demandes de partenariat, de cotation ou d'informations sur l'ensemble de nos pôles d'activités.
-          </p>
+        <div className="max-w-[100rem] mx-auto px-6 lg:px-12 relative z-10">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-3 px-4 py-2 border border-primary/30 bg-primary/10 mb-8">
+              <Globe2 className="text-primary" size={16} />
+              <span className="text-primary text-xs uppercase tracking-widest font-semibold">Présence Internationale</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-serif text-white font-light mb-8 leading-[1.1]">
+              {c.title ? (
+                <span dangerouslySetInnerHTML={{ __html: c.title }} />
+              ) : (
+                <>Contactez <br/><span className="italic text-primary font-normal">MACOF Holding</span></>
+              )}
+            </h1>
+            <p className="text-xl text-white/70 font-sans font-light leading-relaxed">
+              {c.subtitle || FALLBACK.subtitle}
+            </p>
+          </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+      {/* Split-Screen Contact */}
+      <section className="py-24 bg-background border-t border-white/5">
+        <div className="max-w-[100rem] mx-auto px-6 lg:px-12">
           
-          {/* Informations de contact & Carte */}
-          <div className="space-y-16">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-16 lg:gap-24 items-start">
             
-            {/* Siège Social */}
-            <div className="bg-white/[0.02] border border-white/10 p-8">
-              <h3 className="text-xs font-sans tracking-[0.3em] text-primary uppercase mb-8">Siège Social & Direction Générale</h3>
+            {/* Colonne de Gauche : Coordonnées (Ultra Riche) */}
+            <div className="space-y-12">
               
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <MapPin className="text-primary mt-1 w-5 h-5 flex-shrink-0" />
-                  <div>
-                    <p className="text-white font-serif text-xl mb-1">Siège MACOF Holding</p>
-                    <p className="text-white/60 font-light text-sm leading-relaxed">
-                      Manquepa en face de banc bleu<br/>
-                      Kaloum, République de Guinée
-                    </p>
+              {/* Carte Siège Social (Visuel B2B) */}
+              <div className="relative h-72 w-full overflow-hidden bg-card border border-white/10 group">
+                <img 
+                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop" 
+                  alt="Siège Social" 
+                  className="w-full h-full object-cover opacity-60 filter grayscale-[50%] group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Building2 className="text-primary" size={24} />
+                    <h3 className="text-xl font-serif text-white">{c.siege_name || FALLBACK.siege_name}</h3>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <Phone className="text-primary w-5 h-5 flex-shrink-0" />
-                  <p className="text-white font-light">+ 224 625 74 46 26 / 623 98 75 11</p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <Mail className="text-primary w-5 h-5 flex-shrink-0" />
-                  <p className="text-white font-light">macofholding2018@gmail.com</p>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Clock className="text-primary mt-1 w-5 h-5 flex-shrink-0" />
-                  <div className="text-white/60 font-light text-sm">
-                    <p>Lundi - Vendredi : 08h00 - 18h00</p>
-                    <p>Samedi : 09h00 - 13h00</p>
-                  </div>
+                  <p className="text-white/80 font-sans text-sm whitespace-pre-line tracking-wide">
+                    {adresse}
+                  </p>
                 </div>
               </div>
-            </div>
 
-            {/* Contacts par Filiales */}
-            <div>
-              <h3 className="text-2xl font-serif text-white mb-6">Lignes Directes Filiales</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { n: "Immobilier", e: "immo@macofholding.com", t: "+224 620 00 00 01" },
-                  { n: "Restauration", e: "seba@macofholding.com", t: "+224 620 00 00 02" },
-                  { n: "Transit", e: "transit@macofholding.com", t: "+224 620 00 00 03" },
-                  { n: "Mining", e: "mining@macofholding.com", t: "+224 620 00 00 04" },
-                  { n: "Print", e: "print@macofholding.com", t: "+224 620 00 00 05" },
-                  { n: "Fishing", e: "fishing@macofholding.com", t: "+224 620 00 00 06" },
-                ].map(filiale => (
-                  <div key={filiale.n} className="p-4 border border-white/5 bg-white/[0.01]">
-                    <h4 className="text-white font-serif text-lg mb-2">{filiale.n}</h4>
-                    <p className="text-blue-200 font-light text-xs mb-1">{filiale.e}</p>
-                    <p className="text-white/60 font-light text-xs">{filiale.t}</p>
+              {/* Coordonnées Principales */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="p-6 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Phone className="text-primary" size={20} strokeWidth={1.5} />
                   </div>
-                ))}
+                  <h4 className="text-white font-serif text-lg mb-2">Lignes Téléphoniques</h4>
+                  <p className="text-white/60 font-light text-sm">{telephone}</p>
+                </div>
+                
+                <div className="p-6 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Mail className="text-primary" size={20} strokeWidth={1.5} />
+                  </div>
+                  <h4 className="text-white font-serif text-lg mb-2">Adresse Email</h4>
+                  <p className="text-white/60 font-light text-sm">{email}</p>
+                </div>
               </div>
+
+              {/* Horaires & Lignes Filiales */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="p-6 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Clock className="text-primary" size={20} strokeWidth={1.5} />
+                  </div>
+                  <h4 className="text-white font-serif text-lg mb-2">Horaires d'Ouverture</h4>
+                  <p className="text-white/60 font-light text-sm whitespace-pre-line">{horaires}</p>
+                </div>
+
+                <div className="p-6 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                    <Globe2 className="text-primary" size={20} strokeWidth={1.5} />
+                  </div>
+                  <h4 className="text-white font-serif text-lg mb-2">Départements</h4>
+                  <ul className="text-white/60 font-light text-sm space-y-1">
+                    {filialeList.slice(0, 4).map((f: any) => (
+                      <li key={f.id || f.slug}>— {f.nom}</li>
+                    ))}
+                    {filialeList.length > 4 && <li>— Et autres filiales...</li>}
+                  </ul>
+                </div>
+              </div>
+
             </div>
 
-            {/* Carte Interactive (Google Maps iframe) */}
-            <div className="h-80 w-full border border-white/10 relative bg-white/5">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15764.128795550267!2d-13.7153676!3d9.510001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMzAnMzYuMCJOIDEzwrA0MicyNS4zIlc!5e0!3m2!1sfr!2s!4v1600000000000!5m2!1sfr!2s" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(100%)' }} 
-                allowFullScreen={false} 
-                loading="lazy"
-                title="Carte Siège MACOF"
-              ></iframe>
-              <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-md px-4 py-2 border border-white/10">
-                <span className="text-xs uppercase tracking-widest text-primary font-sans">Siège MACOF, Kaloum</span>
+            {/* Colonne de Droite : Formulaire Hyper Épuré */}
+            <div className="relative">
+              <div className="absolute -inset-8 bg-primary/5 blur-3xl rounded-full z-0 pointer-events-none"></div>
+              <div className="relative z-10 bg-white p-8 md:p-14 shadow-2xl">
+                <h2 className="text-4xl font-serif text-black mb-4">Envoyer un Message</h2>
+                <p className="text-gray-500 font-light text-base mb-10 leading-relaxed">
+                  Sélectionnez le département concerné via le formulaire ci-dessous pour un traitement rapide et ciblé de votre requête.
+                </p>
+                <div className="contact-form-wrapper">
+                  <ContactForm filiale="Holding" typeDemande="information" titre="" />
+                </div>
               </div>
             </div>
 
           </div>
 
-          {/* Formulaire Global */}
-          <div className="relative">
-            <div className="absolute -inset-4 bg-primary/5 blur-3xl rounded-full z-0 pointer-events-none"></div>
-            <div className="relative z-10">
-              <div className="bg-white p-8 md:p-12 border border-white/10 shadow-2xl">
-                <h2 className="text-3xl font-serif text-black mb-2">Envoyer un Message</h2>
-                <p className="text-gray-500 font-light text-sm mb-8">Sélectionnez le département concerné pour un traitement rapide de votre demande.</p>
-                <ContactForm filiale="Holding" titre="" />
-              </div>
+          {/* Carte Maps Optionnelle */}
+          <div className="mt-24 border border-white/10 bg-white/5 relative h-[400px]">
+            <iframe
+              src={c.map_embed || FALLBACK.map_embed}
+              width="100%"
+              height="100%"
+              style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(100%) grayscale(50%)' }}
+              allowFullScreen={false}
+              loading="lazy"
+              title="Carte Siège MACOF"
+            ></iframe>
+            <div className="absolute top-6 left-6 bg-background/95 backdrop-blur-md px-6 py-3 border border-white/10 shadow-xl">
+              <span className="text-xs uppercase tracking-widest text-primary font-sans font-semibold flex items-center gap-2">
+                <MapPin size={14} /> {c.map_label || FALLBACK.map_label}
+              </span>
             </div>
           </div>
 
         </div>
+      </section>
 
-      </div>
     </AnimatedPage>
   );
 }

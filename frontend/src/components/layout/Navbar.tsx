@@ -46,7 +46,8 @@ export function Navbar() {
               </Link>
             </div>
 
-            <div className="hidden lg:flex items-center space-x-10">
+            <div className="hidden lg:flex items-center gap-12">
+              <Link to="/" className="text-[10px] font-sans text-white/80 hover:text-white transition-colors tracking-[0.2em] uppercase">Accueil</Link>
               <Link to="/about" className="text-[10px] font-sans text-white/80 hover:text-white transition-colors tracking-[0.2em] uppercase">À propos</Link>
               <Link to="/domaines" className="text-[10px] font-sans text-white/80 hover:text-white transition-colors tracking-[0.2em] uppercase">Domaines d'Activité</Link>
               <Link to="/galerie" className="text-[10px] font-sans text-white/80 hover:text-white transition-colors tracking-[0.2em] uppercase">Galerie</Link>
@@ -77,7 +78,8 @@ export function Navbar() {
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 bg-blue-950/95 backdrop-blur-xl lg:hidden flex flex-col items-center justify-center pt-20">
-          <div className="flex flex-col items-center space-y-8 w-full px-6">
+            <div className="flex flex-col items-center space-y-8 w-full px-6">
+            <Link to="/" className="text-sm font-sans text-white hover:text-red-500 transition-colors tracking-[0.2em] uppercase w-full text-center py-4 border-b border-white/10">Accueil</Link>
             <Link to="/about" className="text-sm font-sans text-white hover:text-red-500 transition-colors tracking-[0.2em] uppercase w-full text-center py-4 border-b border-white/10">À propos</Link>
             <Link to="/domaines" className="text-sm font-sans text-white hover:text-red-500 transition-colors tracking-[0.2em] uppercase w-full text-center py-4 border-b border-white/10">Domaines d'Activité</Link>
             <Link to="/galerie" className="text-sm font-sans text-white hover:text-red-500 transition-colors tracking-[0.2em] uppercase w-full text-center py-4 border-b border-white/10">Galerie</Link>

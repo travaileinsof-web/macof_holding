@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState , useMemo } from 'react';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
+import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useQuery } from '@tanstack/react-query';
@@ -43,35 +43,46 @@ export default function Immobilier() {
   const [formData, setFormData] = useState({ nom_complet: '', email: '', telephone: '', objet: '', message: '' });
   const [reference, setReference] = useState('');
   const [whatsappUrl, setWhatsappUrl] = useState('');
+  const [content, setContent] = useState(fallbackContent);
+  const [loading, setLoading] = useState(true);
+  const [filialeData, setFilialeData] = useState<any>(null);
 
-  const { data: content, isLoading: loading } = useQuery({
-    queryKey: ['pageContent', SLUG],
-    queryFn: async () => {
-      try {
-        const res = await axios.get(`/api/v1/pages/${SLUG}`);
-        if (res.data.success && res.data.data) return res.data.data;
-      } catch (err) {
-        console.warn('API error, using fallback');
+    useEffect(() => {
+    Promise.all([
+      axios.get(`/api/v1/pages/${SLUG}`).catch(() => null),
+      axios.get(`/api/v1/filiales/${SLUG}`).catch(() => null)
+    ]).then(([pagesRes, filialesRes]) => {
+      if (pagesRes?.data?.success) {
+        setContent(mergeContent(fallbackContent, pagesRes.data.data));
+      } else {
+        setContent(fallbackContent);
       }
-      return null;
-    },
-    refetchInterval: 30000,
-  });
+      if (filialesRes?.data?.success) {
+        setFilialeData(filialesRes.data.data);
+      }
+    }).finally(() => setLoading(false));
+  }, []);
 
-  const { data: realisations = [] } = useQuery({
-    queryKey: ['galerie', 'macof-immobilier'],
-    queryFn: async () => {
+  useEffect(() => {
+    const poll = setInterval(() => {
+      axios.get(`/api/v1/pages/${SLUG}`)
+        .then(res => { if (res.data.success) setContent(mergeContent(fallbackContent, res.data.data)); })
+        .catch(() => {});
+    }, 30000);
+    return () => clearInterval(poll);
+  }, []);
+
+  const realisations = useMemo(() => {
+    if (content?.realisations) {
       try {
-        const res = await axios.get('/api/v1/galerie?filiale=macof-immobilier&limit=6');
-        if (res.data.success) {
-          return Array.isArray(res.data.data) ? res.data.data : (res.data.data?.items || []);
-        }
-      } catch (err) {
-        console.warn('API error galerie');
+        const parsed = typeof content.realisations === 'string' ? JSON.parse(content.realisations) : content.realisations;
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        console.warn('Error parsing realisations JSON');
       }
-      return [];
-    },
-  });
+    }
+    return [];
+  }, [content?.realisations]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +101,16 @@ export default function Immobilier() {
     }
   };
 
-  const services = content?.services ? JSON.parse(content.services) : fallbackServices;
+  // Force fallbackServices to display the rich text if DB items lack descriptions
+  let services = fallbackServices;
+  if (content?.services) {
+    try {
+      const parsed = JSON.parse(content.services);
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].desc) {
+        services = parsed;
+      }
+    } catch(e) {}
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -282,8 +302,8 @@ export default function Immobilier() {
                 </p>
                 <div className="bg-gray-50 p-8 border border-gray-200">
                   <h4 className="text-xl font-serif text-gray-900 mb-4">Ligne Directe BTP</h4>
-                  <p className="text-gray-600 font-light text-sm mb-2">Email : {content?.contact_email || fallbackContent.contact_email}</p>
-                  <p className="text-gray-600 font-light text-sm mb-2">Téléphone : {content?.contact_phone || fallbackContent.contact_phone}</p>
+                  <p className="text-gray-600 font-light text-sm mb-2">Email : {filialeData?.email || content?.contact_email || fallbackContent.contact_email}</p>
+                  <p className="text-gray-600 font-light text-sm mb-2">Téléphone : {filialeData?.telephone || content?.contact_phone || fallbackContent.contact_phone}</p>
                   <p className="text-gray-600 font-light text-sm">Adresse : Manquepa, en face de Banc Bleu, Kaloum, Conakry</p>
                 </div>
               </div>

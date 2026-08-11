@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
 import { MessageCircle } from 'lucide-react';
+import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,29 +37,39 @@ const fallbackServices = [
 export default function Restauration() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState<Record<string, string> | null>(null);
+  const [filialeData, setFilialeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState({ nom_complet: '', email: '', telephone: '', objet: '', message: '' });
   const [reference, setReference] = useState('');
   const [whatsappUrl, setWhatsappUrl] = useState('');
 
-  // Fetch page content
+  // Fetch page content and filiale data
   useEffect(() => {
-    axios.get(`/api/v1/pages/${SLUG}`)
-      .then(res => { if (res.data.success) setContent(res.data.data); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      axios.get(`/api/v1/pages/${SLUG}`).catch(() => null),
+      axios.get(`/api/v1/filiales/${SLUG}`).catch(() => null)
+    ]).then(([pagesRes, filialesRes]) => {
+      if (pagesRes?.data?.success) setContent(mergeContent(fallbackContent, pagesRes.data.data));
+      else setContent(fallbackContent);
+      if (filialesRes?.data?.success) setFilialeData(filialesRes.data.data);
+    }).finally(() => setLoading(false));
   }, []);
 
   // Polling every 30s
   useEffect(() => {
     const poll = setInterval(() => {
-      axios.get(`/api/v1/pages/${SLUG}`)
-        .then(res => { if (res.data.success) setContent(res.data.data); })
-        .catch(() => {});
+      Promise.all([
+        axios.get(`/api/v1/pages/${SLUG}`).catch(() => null),
+        axios.get(`/api/v1/filiales/${SLUG}`).catch(() => null)
+      ]).then(([pagesRes, filialesRes]) => {
+        if (pagesRes?.data?.success) setContent(mergeContent(fallbackContent, pagesRes.data.data));
+        if (filialesRes?.data?.success) setFilialeData(filialesRes.data.data);
+      });
     }, 30000);
     return () => clearInterval(poll);
   }, []);
+
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +88,16 @@ export default function Restauration() {
     }
   };
 
-  const services: any[] = content?.services ? JSON.parse(content.services) : fallbackServices;
+  // Force fallbackServices to display the rich text if DB items lack descriptions
+  let services = fallbackServices;
+  if (content?.services) {
+    try {
+      const parsed = JSON.parse(content.services);
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].desc) {
+        services = parsed;
+      }
+    } catch(e) {}
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -233,9 +252,9 @@ export default function Restauration() {
                 </div>
                 <div className="space-y-4">
                   {[
-                    { nom: "Menu Signature SEBA", desc: "Dégustation en 5 services, fusion terre-mer.", prix: "Sur devis" },
-                    { nom: "Buffet Corporate", desc: "Assortiment de verrines, plats chauds et mignardises.", prix: "Sur devis" },
-                    { nom: "Pause Café Premium", desc: "Viennoiseries fines, jus pressés, sélection de thés/cafés.", prix: "Sur devis" }
+                    { nom: "Boulangerie & Pâtisserie", desc: "Croissants purs beurre, pains artisanaux, et entremets créatifs.", prix: "Sur devis" },
+                    { nom: "Plats Chauds & Traiteur", desc: "Dégustation en 5 services, fusion terre-mer et spécialités africaines.", prix: "Sur devis" },
+                    { nom: "Boissons & Cocktails", desc: "Jus pressés à froid, sélection de vins et cocktails sans alcool premium.", prix: "Sur devis" }
                   ].map((menu, i) => (
                     <div key={i} className="p-6 border border-white/10 bg-white/[0.02] flex justify-between items-center group cursor-pointer hover:bg-white/[0.05]">
                       <div>
@@ -291,8 +310,8 @@ export default function Restauration() {
                 </p>
                 <div className="bg-white/5 p-8 border border-white/10">
                   <h4 className="text-xl font-serif text-white mb-4">Contact Direct Restauration</h4>
-                  <p className="text-blue-200 font-light text-sm mb-2">Email: {content?.contact_email || fallbackContent.contact_email}</p>
-                  <p className="text-blue-200 font-light text-sm">Téléphone: {content?.contact_phone || fallbackContent.contact_phone}</p>
+                  <p className="text-blue-200 font-light text-sm mb-2">Email: {filialeData?.email || content?.contact_email || fallbackContent.contact_email}</p>
+                  <p className="text-blue-200 font-light text-sm">Téléphone: {filialeData?.telephone || content?.contact_phone || fallbackContent.contact_phone}</p>
                 </div>
               </div>
               

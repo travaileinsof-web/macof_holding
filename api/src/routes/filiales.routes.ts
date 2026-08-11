@@ -57,4 +57,37 @@ filialesRoutes.get('/id/:id', async (c) => {
   return success(c, filiale);
 });
 
+// PUT /api/filiales/id/:id - Update filiale contacts and details
+filialesRoutes.put('/id/:id', async (c) => {
+  const id = parseInt(c.req.param('id'), 10);
+  const body = await c.req.json();
+  
+  // We only allow updating contact fields and description for now to be safe
+  const { telephone, email, adresse, site_web, description } = body;
+
+  const [existing] = await db
+    .select()
+    .from(filiales)
+    .where(eq(filiales.id, id))
+    .limit(1);
+
+  if (!existing) {
+    return error(c, 'Filiale non trouvee', 404);
+  }
+
+  await db
+    .update(filiales)
+    .set({
+      telephone: telephone !== undefined ? telephone : existing.telephone,
+      email: email !== undefined ? email : existing.email,
+      adresse: adresse !== undefined ? adresse : existing.adresse,
+      site_web: site_web !== undefined ? site_web : existing.site_web,
+      description: description !== undefined ? description : existing.description,
+      updated_at: new Date()
+    })
+    .where(eq(filiales.id, id));
+
+  return success(c, { message: 'Filiale updated successfully' });
+});
+
 export default filialesRoutes;

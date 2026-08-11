@@ -8,14 +8,18 @@ import {
   RefreshCw,
   Image as ImageIcon,
 } from 'lucide-react';
-import axios from 'axios';
+import { api } from '../../lib/api';
+import { AdminPage } from '../../components/ui/AdminPage';
 
 interface GalerieItem {
   id: number;
   titre: string;
-  filiale: string;
-  description: string;
-  image_url: string;
+  filiale: number | null;
+  filiale_nom?: string | null;
+  description_courte?: string;
+  description?: string;
+  image_path: string;
+  image_url?: string;
   created_at: string;
 }
 
@@ -23,15 +27,6 @@ interface FilialeOption {
   id: number;
   nom: string;
 }
-
-const api = axios.create();
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 export default function GalerieManager() {
   const [images, setImages] = useState<GalerieItem[]>([]);
@@ -46,6 +41,8 @@ export default function GalerieManager() {
   const [formTitre, setFormTitre] = useState('');
   const [formFiliale, setFormFiliale] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const [formTypeProjet, setFormTypeProjet] = useState('autre');
+  const [formLieu, setFormLieu] = useState('');
   const [formFile, setFormFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,8 +52,14 @@ export default function GalerieManager() {
         api.get('/api/v1/admin/galerie'),
         api.get('/api/v1/admin/filiales'),
       ]);
-      if (galerieRes.data.success) setImages(galerieRes.data.data || []);
-      if (filialesRes.data.success) setFiliales(filialesRes.data.data || []);
+      if (galerieRes.data.success) {
+        const gData = galerieRes.data.data;
+        setImages(Array.isArray(gData) ? gData : (gData.items || []));
+      }
+      if (filialesRes.data.success) {
+        const fData = filialesRes.data.data;
+        setFiliales(Array.isArray(fData) ? fData : (fData.items || []));
+      }
     } catch (err) {
       console.error('Erreur fetch galerie:', err);
     } finally {
@@ -69,11 +72,12 @@ export default function GalerieManager() {
   }, [fetchData]);
 
   const filteredImages = images.filter((img) => {
+    const filialeLabel = img.filiale_nom || img.filiale || '';
     const matchSearch =
       !search ||
-      img.titre.toLowerCase().includes(search.toLowerCase()) ||
-      img.filiale.toLowerCase().includes(search.toLowerCase());
-    const matchFiliale = !filialeFilter || img.filiale === filialeFilter;
+      (img.titre || '').toLowerCase().includes(search.toLowerCase()) ||
+      String(filialeLabel).toLowerCase().includes(search.toLowerCase());
+    const matchFiliale = !filialeFilter || String(filialeLabel) === filialeFilter;
     return matchSearch && matchFiliale;
   });
 
@@ -90,6 +94,8 @@ export default function GalerieManager() {
     setFormTitre('');
     setFormFiliale(filiales[0]?.nom || '');
     setFormDescription('');
+    setFormTypeProjet('autre');
+    setFormLieu('');
     setFormFile(null);
     setPreviewUrl(null);
     setModalOpen(true);
@@ -109,6 +115,8 @@ export default function GalerieManager() {
       formData.append('titre', formTitre);
       formData.append('filiale', formFiliale);
       formData.append('description', formDescription);
+      formData.append('type_projet', formTypeProjet);
+      formData.append('lieu', formLieu);
       formData.append('image', formFile);
 
       await api.post('/api/v1/admin/galerie', formData);
@@ -127,20 +135,15 @@ export default function GalerieManager() {
     try {
       await api.delete(`/api/v1/admin/galerie/${id}`);
       fetchData();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erreur suppression:', err);
+      alert(err?.response?.data?.message || 'Erreur lors de la suppression.');
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 text-[#cda434] animate-spin" />
-      </div>
-    );
-  }
 
   return (
+    <AdminPage loading={loading}>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -192,7 +195,7 @@ export default function GalerieManager() {
           >
             <div className="relative aspect-video bg-slate-800 overflow-hidden">
               <img
-                src={img.image_url}
+                src={img.image_path || img.image_url}
                 alt={img.titre}
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -207,7 +210,7 @@ export default function GalerieManager() {
             <div className="p-3">
               <h3 className="text-sm font-medium text-slate-200 truncate">{img.titre}</h3>
               <span className="inline-block mt-1 text-xs bg-[#cda434]/10 text-[#cda434] rounded-full px-2 py-0.5">
-                {img.filiale}
+                {img.filiale_nom || img.filiale || '—'}
               </span>
             </div>
           </div>
@@ -259,11 +262,39 @@ export default function GalerieManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Catégorie de projet</label>
+                <select
+                  value={formTypeProjet}
+                  onChange={(e) => setFormTypeProjet(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors"
+                >
+                  <option value="residentiel">Résidentiel</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="infrastructure">Infrastructure</option>
+                  <option value="evenement">Événement</option>
+                  <option value="production">Production</option>
+                  <option value="logistique">Logistique</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Lieu</label>
+                <input
+                  type="text"
+                  value={formLieu}
+                  onChange={(e) => setFormLieu(e.target.value)}
+                  placeholder="Ex: Conakry, Guinée"
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Description courte</label>
                 <textarea
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  rows={3}
+                  rows={2}
                   className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500 transition-colors resize-none"
                 />
               </div>
@@ -309,5 +340,6 @@ export default function GalerieManager() {
         </div>
       )}
     </div>
+    </AdminPage>
   );
 }
