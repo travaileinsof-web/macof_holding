@@ -6,8 +6,8 @@ import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/uti
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { MessageCircle, HardHat, Building2, Landmark, Hammer, Ruler } from 'lucide-react';
+import { api } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -49,8 +49,8 @@ export default function Immobilier() {
 
     useEffect(() => {
     Promise.all([
-      axios.get(`/api/v1/pages/${SLUG}`).catch(() => null),
-      axios.get(`/api/v1/filiales/${SLUG}`).catch(() => null)
+      api.get(`/pages/${SLUG}`).catch(() => null),
+      api.get(`/filiales/${SLUG}`).catch(() => null)
     ]).then(([pagesRes, filialesRes]) => {
       if (pagesRes?.data?.success) {
         setContent(mergeContent(fallbackContent, pagesRes.data.data));
@@ -65,7 +65,7 @@ export default function Immobilier() {
 
   useEffect(() => {
     const poll = setInterval(() => {
-      axios.get(`/api/v1/pages/${SLUG}`)
+      api.get(`/pages/${SLUG}`)
         .then(res => { if (res.data.success) setContent(mergeContent(fallbackContent, res.data.data)); })
         .catch(() => {});
     }, 30000);
@@ -88,7 +88,7 @@ export default function Immobilier() {
     e.preventDefault();
     setFormStatus('loading');
     try {
-      const response = await axios.post('/api/v1/demandes', { ...formData, filiale: 'MACOF Immobilier', type_demande: 'devis' });
+      const response = await api.post('/demandes', { ...formData, filiale: 'MACOF Immobilier', type_demande: 'devis' });
       if (response.data.success) {
         setReference(response.data.data?.reference || '');
         setWhatsappUrl(response.data.data?.whatsapp_url || '');

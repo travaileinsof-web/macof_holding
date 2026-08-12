@@ -5,8 +5,8 @@ import { Input } from '../../components/ui/Input';
 import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import axios from 'axios';
 import { MessageCircle } from 'lucide-react';
+import { api } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,8 +43,9 @@ export default function Fishing() {
   // Fetch page content and filiale data
   useEffect(() => {
     Promise.all([
-      axios.get(`/api/v1/pages/${SLUG}`).catch(() => null),
-      axios.get(`/api/v1/filiales/${SLUG}`).catch(() => null)
+      api.get(`/pages/${SLUG}`).catch(() => null),
+      api.get(`/filiales/${SLUG}`).catch(() => null) ,
+      api.get(`/filiales/${SLUG}`).catch(() => null)
     ]).then(([pagesRes, filialesRes]) => {
       if (pagesRes?.data?.success) setContent(mergeContent(fallbackContent, pagesRes.data.data));
       else setContent(fallbackContent);
@@ -56,8 +57,9 @@ export default function Fishing() {
   useEffect(() => {
     const poll = setInterval(() => {
       Promise.all([
-        axios.get(`/api/v1/pages/${SLUG}`).catch(() => null),
-        axios.get(`/api/v1/filiales/${SLUG}`).catch(() => null)
+        api.get(`/pages/${SLUG}`).catch(() => null),
+        api.get(`/filiales/${SLUG}`).catch(() => null),
+        api.get(`/filiales/${SLUG}`).catch(() => null)
       ]).then(([pagesRes, filialesRes]) => {
         if (pagesRes?.data?.success) setContent(mergeContent(fallbackContent, pagesRes.data.data));
         if (filialesRes?.data?.success) setFilialeData(filialesRes.data.data);
@@ -70,7 +72,7 @@ export default function Fishing() {
     e.preventDefault();
     setFormStatus('loading');
     try {
-      const response = await axios.post('/api/v1/demandes', { ...formData, filiale: 'MACOF Fishing', type_demande: 'devis' });
+      const response = await api.post('/demandes', { ...formData, filiale: 'MACOF Fishing', type_demande: 'devis' });
       if (response.data.success) {
         setReference(response.data.data?.reference || '');
         setWhatsappUrl(response.data.data?.whatsapp_url || '');

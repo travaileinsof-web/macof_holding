@@ -3,9 +3,9 @@ import { ContactForm } from '../components/ContactForm';
 import { useSettings } from '../hooks/useSettings';
 import { MapPin, Phone, Mail, Clock, Building2, Globe2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { api } from '@/lib/api';
 
-// Fallback data used if the CMS API is unavailable
+// Fallback data
 const FALLBACK = {
   title: 'Lignes Directes',
   subtitle: "Nos équipes dédiées sont à votre entière disposition pour répondre à vos demandes de partenariat, de cotation ou d'informations sur l'ensemble de nos pôles d'activités.",
@@ -19,6 +19,7 @@ const FALLBACK = {
 };
 
 const FALLBACK_FILIALES = [
+  { nom: 'MACOF Holding' },
   { nom: 'MACOF Immobilier', slug: 'immobilier' },
   { nom: 'MACOF Restauration', slug: 'restauration' },
   { nom: 'MACOF Transit', slug: 'transit' },
@@ -31,23 +32,36 @@ export default function Contact() {
   const { data } = useQuery({
     queryKey: ['contactData'],
     queryFn: async () => {
+      let pageData = null;
+      let filialesData = [];
+
+      // 1. Récupération des données de la page Contact
       try {
-        const [pageRes, filialesRes] = await Promise.all([
-          axios.get('/api/v1/pages/contact'),
-          axios.get('/api/v1/filiales'),
-        ]);
-        return {
-          content: pageRes.data.success ? pageRes.data.data : null,
-          filiales: filialesRes.data.success 
-            ? (Array.isArray(filialesRes.data.data) ? filialesRes.data.data : (filialesRes.data.data.items || []))
-            : []
-        };
-      } catch (err) {
-        console.warn("API Error contact");
+        const pageRes = await api.get('/pages/contact');
+        if (pageRes.data?.success) {
+          pageData = pageRes.data.data;
+        }
+      } catch (e) {
+        console.warn("Info: Page CMS contact non configurée ou introuvable, utilisation du fallback.");
       }
-      return { content: null, filiales: [] };
+
+      // 2. Récupération des filiales (changement de /api/v1/filiales -> /filiales)
+      try {
+        const filialesRes = await api.get('/filiales');
+        if (filialesRes.data?.success) {
+          const raw = filialesRes.data.data;
+          filialesData = Array.isArray(raw) ? raw : (raw?.items || []);
+        }
+      } catch (e) {
+        console.warn("Info: Endpoint filiales introuvable, utilisation du fallback.");
+      }
+
+      return {
+        content: pageData,
+        filiales: filialesData
+      };
     },
-    
+    retry: false // Évite de re-tester inutilement si une route 404 est appelée
   });
 
   const { settings } = useSettings();
@@ -93,10 +107,10 @@ export default function Contact() {
           
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-16 lg:gap-24 items-start">
             
-            {/* Colonne de Gauche : Coordonnées (Ultra Riche) */}
+            {/* Colonne de Gauche : Coordonnées */}
             <div className="space-y-12">
               
-              {/* Carte Siège Social (Visuel B2B) */}
+              {/* Carte Siège Social */}
               <div className="relative h-72 w-full overflow-hidden bg-card border border-white/10 group">
                 <img 
                   src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop" 
@@ -149,8 +163,8 @@ export default function Contact() {
                   </div>
                   <h4 className="text-white font-serif text-lg mb-2">Départements</h4>
                   <ul className="text-white/60 font-light text-sm space-y-1">
-                    {filialeList.slice(0, 4).map((f: any) => (
-                      <li key={f.id || f.slug}>— {f.nom}</li>
+                    {filialeList.slice(0, 4).map((f: any, i: number) => (
+                      <li key={f.id || f.slug || i}>— {f.nom}</li>
                     ))}
                     {filialeList.length > 4 && <li>— Et autres filiales...</li>}
                   </ul>
@@ -159,7 +173,7 @@ export default function Contact() {
 
             </div>
 
-            {/* Colonne de Droite : Formulaire Hyper Épuré */}
+            {/* Colonne de Droite : Formulaire */}
             <div className="relative">
               <div className="absolute -inset-8 bg-primary/5 blur-3xl rounded-full z-0 pointer-events-none"></div>
               <div className="relative z-10 bg-white p-8 md:p-14 shadow-2xl">
@@ -168,14 +182,19 @@ export default function Contact() {
                   Sélectionnez le département concerné via le formulaire ci-dessous pour un traitement rapide et ciblé de votre requête.
                 </p>
                 <div className="contact-form-wrapper">
-                  <ContactForm filiale="Holding" typeDemande="information" titre="" />
+                  <ContactForm 
+                    filiales={filialeList} 
+                    filiale="MACOF Holding" 
+                    typeDemande="information" 
+                    titre="" 
+                  />
                 </div>
               </div>
             </div>
 
           </div>
 
-          {/* Carte Maps Optionnelle */}
+          {/* Carte Google Maps */}
           <div className="mt-24 border border-white/10 bg-white/5 relative h-[400px]">
             <iframe
               src={c.map_embed || FALLBACK.map_embed}

@@ -5,9 +5,9 @@ import { Input } from '../../components/ui/Input';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { MessageCircle, Palette, Printer, Presentation, Megaphone } from 'lucide-react';
 import { mergeContent, getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
+import { api } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,7 +47,7 @@ export default function Print() {
     queryKey: ['filialeData', SLUG],
     queryFn: async () => {
       try {
-        const res = await axios.get(`/api/v1/filiales/${SLUG}`);
+        const res = await api.get(`/filiales/${SLUG}`);
         if (res.data.success) return res.data.data;
       } catch (e) {
         console.warn('API Error filiale');
@@ -68,7 +68,7 @@ export default function Print() {
     queryKey: ['pageContent', SLUG],
     queryFn: async () => {
       try {
-        const res = await axios.get(`/api/v1/pages/${SLUG}`);
+        const res = await api.get(`/pages/${SLUG}`);
         if (res.data.success && res.data.data) return mergeContent(fallbackContent, res.data.data);
       } catch (err) {
         console.warn('API Error');
@@ -94,7 +94,7 @@ export default function Print() {
     e.preventDefault();
     setFormStatus('loading');
     try {
-      const response = await axios.post('/api/v1/demandes', { ...formData, filiale: 'MACOF Print & Com', type_demande: 'devis' });
+      const response = await api.post('/demandes', { ...formData, filiale: 'MACOF Print & Com', type_demande: 'devis' });
       if (response.data.success) {
         setReference(response.data.data?.reference || '');
         setWhatsappUrl(response.data.data?.whatsapp_url || '');

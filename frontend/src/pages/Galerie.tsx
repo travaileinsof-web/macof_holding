@@ -2,8 +2,19 @@ import { useEffect, useState } from 'react';
 import { AnimatedPage } from '../components/layout/AnimatedPage';
 import { X, ZoomIn } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '@/lib/api';
+
+
+
+// Helper pour gérer les URLs relatives et absolues d'images
+const getImageUrl = (path: string | undefined) => {
+  if (!path) return '/placeholder.jpg';
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  return path.startsWith('/') ? path : `/${path}`;
+};
 
 const FILTERS = ["Tous", "MACOF Immobilier", "MACOF Restauration", "MACOF Print & Com", "MACOF Mining", "MACOF Transit", "MACOF Fishing"];
 
@@ -28,7 +39,7 @@ export default function Galerie() {
     queryKey: ['galerieData'],
     queryFn: async () => {
       try {
-        const res = await axios.get('/api/v1/galerie');
+        const res = await api.get('/galerie');
         if (res.data.success) {
           const data = res.data.data;
           const items = Array.isArray(data) ? data : (data.items || []);

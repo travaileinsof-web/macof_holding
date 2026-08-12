@@ -5,8 +5,8 @@ import { Button } from '../components/ui/Button';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { DEFAULT_FALLBACK_IMAGE } from '../lib/utils';
+import { api } from '@/lib/api';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -38,7 +38,7 @@ export default function Domaines() {
     queryKey: ['domainesData'],
     queryFn: async () => {
       try {
-        const res = await axios.get('/api/v1/filiales');
+        const res = await api.get('/filiales'); 
         if (res.data.success && res.data.data && res.data.data.length > 0) {
           const apiData = res.data.data;
           // Iterate over FALLBACK_DOMAINES to maintain strict 01-06 order

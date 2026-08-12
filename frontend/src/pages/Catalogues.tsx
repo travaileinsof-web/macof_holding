@@ -4,7 +4,7 @@ import { Download, X, MessageCircle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import gsap from 'gsap';
-import axios from 'axios';
+import { api } from '@/lib/api';
 
 const fallbackCatalogues = [
   { id: 1, titre: 'Catalogue Général MACOF Holding', description: 'Découvrez l\'ensemble de nos services', filiale: 'MACOF Holding', file_path: '#' },
@@ -22,7 +22,7 @@ export default function Catalogues() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    axios.get('/api/v1/catalogues')
+    api.get('/catalogues')
       .then(res => {
         if (res.data.success) {
           const data = res.data.data;
@@ -61,7 +61,7 @@ export default function Catalogues() {
     setDownloadStatus('loading');
     try {
       // Send lead data to API first
-      const response = await axios.post('/api/v1/demandes', {
+      const response = await api.post('/demandes', {
         nom_complet: selectedDoc.leadForm?.nom || 'Visiteur',
         email: selectedDoc.leadForm?.email || '',
         telephone: selectedDoc.leadForm?.telephone || '',
