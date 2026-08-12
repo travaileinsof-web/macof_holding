@@ -1,7 +1,7 @@
-import nodemailer from 'nodemailer';
-import { eq } from 'drizzle-orm';
-import { db } from '../db/client';
-import { settings } from '../db/schema';
+import nodemailer from "nodemailer";
+import { eq, inArray } from "drizzle-orm";
+import { db } from "../db/client";
+import { settings } from "../db/schema";
 
 export interface SmtpConfig {
   host: string;
@@ -10,29 +10,61 @@ export interface SmtpConfig {
   password: string;
 }
 
+// Helper pour sécuriser le contenu HTML contre les injections
+function escapeHtml(text: string | null | undefined): string {
+  if (!text) return "";
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+    .replace(/\n/g, "<br/>");
+}
+
+/**
+ * Récupère la configuration SMTP.
+ * Priorité : Base de données > Fichier .env > Valeurs par défaut
+ */
 async function getSmtpConfig(): Promise<SmtpConfig> {
   try {
-    const [smtpHost] = await db.select({ value: settings.value }).from(settings).where(eq(settings.key, 'smtp_host'));
-    const [smtpPort] = await db.select({ value: settings.value }).from(settings).where(eq(settings.key, 'smtp_port'));
-    const [smtpEmail] = await db.select({ value: settings.value }).from(settings).where(eq(settings.key, 'smtp_email'));
-    const [smtpPassword] = await db.select({ value: settings.value }).from(settings).where(eq(settings.key, 'smtp_password'));
+    const keys = ["smtp_host", "smtp_port", "smtp_email", "smtp_password"];
+    const rows = await db
+      .select({ key: settings.key, value: settings.value })
+      .from(settings)
+      .where(inArray(settings.key, keys));
+
+    const configMap = new Map(rows.map((r) => [r.key, r.value]));
 
     return {
-      host: smtpHost?.value || '',
-      port: smtpPort ? parseInt(smtpPort.value || '587', 10) : 587,
-      email: smtpEmail?.value || '',
-      password: smtpPassword?.value || '',
+      host:
+        configMap.get("smtp_host") || process.env.SMTP_HOST || "smtp.gmail.com",
+      port: parseInt(
+        configMap.get("smtp_port") || process.env.SMTP_PORT || "587",
+        10,
+      ),
+      email: configMap.get("smtp_email") || process.env.SMTP_EMAIL || "",
+      // Nettoyage automatique des espaces éventuels dans le mot de passe d'application Gmail
+      password: (
+        configMap.get("smtp_password") ||
+        process.env.SMTP_PASSWORD ||
+        ""
+      ).replace(/\s+/g, ""),
     };
-  } catch {
+  } catch (error) {
+    // Si la BDD est inaccessible, lecture directe du .env
     return {
-      host: '',
-      port: 587,
-      email: '',
-      password: '',
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: parseInt(process.env.SMTP_PORT || "587", 10),
+      email: process.env.SMTP_EMAIL || "",
+      password: (process.env.SMTP_PASSWORD || "").replace(/\s+/g, ""),
     };
   }
 }
 
+/**
+ * Envoie un email générique via Nodemailer
+ */
 export async function sendEmail(
   to: string,
   subject: string,
@@ -41,18 +73,26 @@ export async function sendEmail(
 ): Promise<boolean> {
   const smtpConfig = await getSmtpConfig();
 
-  if (!smtpConfig.host || !smtpConfig.email) {
-    console.warn('SMTP non configure. Email non envoye.', { to, subject });
+  if (!smtpConfig.host || !smtpConfig.email || !smtpConfig.password) {
+    console.warn("[SMTP] Configuration incomplète. Email non envoyé.", {
+      to,
+      subject,
+    });
     return false;
   }
+
+  const isSecure = smtpConfig.port === 465;
 
   const transporter = nodemailer.createTransport({
     host: smtpConfig.host,
     port: smtpConfig.port,
-    secure: smtpConfig.port === 465,
+    secure: isSecure, // true pour 465, false pour 587
     auth: {
       user: smtpConfig.email,
       pass: smtpConfig.password,
+    },
+    tls: {
+      rejectUnauthorized: process.env.NODE_ENV === "production",
     },
   });
 
@@ -64,14 +104,17 @@ export async function sendEmail(
       html,
       replyTo: options?.replyTo,
     });
-    console.log(`Email envoye a ${to}: ${subject}`);
+    console.log(`[SMTP] Email envoyé avec succès à ${to} : "${subject}"`);
     return true;
   } catch (error) {
-    console.error('Erreur envoi email:', error);
+    console.error("[SMTP Error] Erreur lors de l'envoi de l'email :", error);
     return false;
   }
 }
 
+/**
+ * Construit et envoie l'email de notification de demande de contact à l'admin
+ */
 export async function sendNotificationEmail(demande: {
   reference: string;
   nom_complet: string;
@@ -83,16 +126,38 @@ export async function sendNotificationEmail(demande: {
   message: string;
   filiale?: string | null;
 }): Promise<boolean> {
-  const [notifEmail] = await db
-    .select({ value: settings.value })
-    .from(settings)
-    .where(eq(settings.key, 'notification_email'));
+  let recipient = process.env.NOTIFICATION_EMAIL;
 
-  const recipient = notifEmail?.value || 'macofholding2018@gmail.com';
+  // Si non défini dans .env, tentative de récupération en BDD
+  if (!recipient) {
+    try {
+      const [notifEmail] = await db
+        .select({ value: settings.value })
+        .from(settings)
+        .where(eq(settings.key, "notification_email"));
+      recipient = notifEmail?.value;
+    } catch {
+      // Ignoré
+    }
+  }
+
+  // Destinataire par défaut
+  recipient = recipient || "macofholding2018@gmail.com";
+
+  // Sanitisation des données entrantes
+  const safeRef = escapeHtml(demande.reference);
+  const safeNom = escapeHtml(demande.nom_complet);
+  const safeEmail = escapeHtml(demande.email);
+  const safeTel = escapeHtml(demande.telephone);
+  const safeSociete = escapeHtml(demande.societe);
+  const safeFonction = escapeHtml(demande.fonction);
+  const safeObjet = escapeHtml(demande.objet);
+  const safeFiliale = escapeHtml(demande.filiale);
+  const safeMessage = escapeHtml(demande.message);
 
   const html = `
     <!DOCTYPE html>
-    <html>
+    <html lang="fr">
     <head>
       <meta charset="utf-8">
       <style>
@@ -113,45 +178,65 @@ export async function sendNotificationEmail(demande: {
       <div class="container">
         <div class="header">
           <h1>Nouvelle demande de contact</h1>
-          <p>Référence: <span class="badge">${demande.reference}</span></p>
+          <p>Référence: <span class="badge">${safeRef}</span></p>
         </div>
         <div class="content">
           <div class="field">
             <div class="field-label">Nom complet</div>
-            <div class="field-value">${demande.nom_complet}</div>
+            <div class="field-value">${safeNom}</div>
           </div>
-          ${demande.societe ? `
+          ${
+            demande.societe
+              ? `
           <div class="field">
             <div class="field-label">Société</div>
-            <div class="field-value">${demande.societe}</div>
-          </div>` : ''}
-          ${demande.fonction ? `
+            <div class="field-value">${safeSociete}</div>
+          </div>`
+              : ""
+          }
+          ${
+            demande.fonction
+              ? `
           <div class="field">
             <div class="field-label">Fonction</div>
-            <div class="field-value">${demande.fonction}</div>
-          </div>` : ''}
+            <div class="field-value">${safeFonction}</div>
+          </div>`
+              : ""
+          }
           <div class="field">
             <div class="field-label">Email</div>
-            <div class="field-value">${demande.email}</div>
+            <div class="field-value">${safeEmail}</div>
           </div>
-          ${demande.telephone ? `
+          ${
+            demande.telephone
+              ? `
           <div class="field">
             <div class="field-label">Téléphone</div>
-            <div class="field-value">${demande.telephone}</div>
-          </div>` : ''}
-          ${demande.objet ? `
+            <div class="field-value">${safeTel}</div>
+          </div>`
+              : ""
+          }
+          ${
+            demande.objet
+              ? `
           <div class="field">
             <div class="field-label">Objet</div>
-            <div class="field-value">${demande.objet}</div>
-          </div>` : ''}
-          ${demande.filiale ? `
+            <div class="field-value">${safeObjet}</div>
+          </div>`
+              : ""
+          }
+          ${
+            demande.filiale
+              ? `
           <div class="field">
             <div class="field-label">Filiale concernée</div>
-            <div class="field-value">${demande.filiale}</div>
-          </div>` : ''}
+            <div class="field-value">${safeFiliale}</div>
+          </div>`
+              : ""
+          }
           <div class="field">
             <div class="field-label">Message</div>
-            <div class="field-value">${demande.message}</div>
+            <div class="field-value">${safeMessage}</div>
           </div>
         </div>
         <div class="footer">
