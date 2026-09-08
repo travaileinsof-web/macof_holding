@@ -4,20 +4,12 @@ import { X, ZoomIn } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
+import { getImageUrl as resolveImageUrl } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 
 
 // Helper pour gérer les URLs relatives et absolues d'images
-const getImageUrl = (path: string | undefined) => {
-  if (!path) return '/placeholder.jpg';
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    return path;
-  }
-  return path.startsWith('/') ? path : `/${path}`;
-};
-
-const FILTERS = ["Tous", "MACOF Immobilier", "MACOF Restauration", "MACOF Print & Com", "MACOF Mining", "MACOF Transit", "MACOF Fishing"];
-
 const FALLBACK_GALERIE = [
   { id: 1, filiale: "MACOF Immobilier", titre: "Résidence Kaloum", image_path: "https://images.unsplash.com/photo-1778553244173-c5fc6e857120?q=80&w=1000&auto=format&fit=crop", desc: "Projet résidentiel d'envergure, standing international." },
   { id: 2, filiale: "MACOF Immobilier", titre: "Tour Administrative", image_path: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop", desc: "Construction de bureaux modernes." },
@@ -56,6 +48,8 @@ export default function Galerie() {
   const filteredImages = activeFilter === "Tous"
     ? images
     : images.filter((img: any) => (img.filiale_nom || img.filiale) === activeFilter);
+  const filialNames = images.map((img: any) => String(img.filiale_nom || img.filiale || '')).filter(Boolean) as string[];
+  const filters: string[] = ["Tous", ...Array.from(new Set<string>(filialNames))];
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -80,17 +74,24 @@ export default function Galerie() {
             <p className="text-white/60 font-sans font-light max-w-2xl mx-auto leading-relaxed text-lg">
               Une sélection visuelle illustrant l'excellence opérationnelle de MACOF Holding à travers ses six pôles d'expertise.
             </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <Link to="/restauration#menu-commande" className="inline-flex px-6 py-3 bg-white text-black text-xs uppercase tracking-[0.2em] hover:bg-red-200 transition-colors">
+                Découvrir le menu SEBA
+              </Link>
+              <Link to="/restauration" className="inline-flex px-6 py-3 border border-white/20 bg-white/5 text-white text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-colors">
+                Voir la page Restauration
+              </Link>
+            </div>
           </div>
 
-          {/* Filtres Interactifs */}
           <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-16">
-            {FILTERS.map(f => (
+            {filters.map((f) => (
               <button
                 key={f}
                 onClick={() => setActiveFilter(f)}
                 className={`px-5 py-2.5 text-xs font-sans tracking-[0.2em] uppercase transition-all duration-500 rounded-full border ${
-                  activeFilter === f 
-                    ? 'border-white bg-white text-black' 
+                  activeFilter === f
+                    ? 'border-white bg-white text-black'
                     : 'border-white/10 text-white/70 hover:border-white/40 hover:text-white bg-white/[0.02]'
                 }`}
               >
@@ -118,7 +119,7 @@ export default function Galerie() {
                 >
                   <div className="aspect-auto overflow-hidden">
                     <img
-                      src={getImageUrl(img.image_path)}
+                      src={resolveImageUrl(img.image_path)}
                       alt={img.titre} 
                       className="w-full h-auto object-cover filter grayscale-[30%] group-hover:grayscale-0 transform group-hover:scale-110 transition-all duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)]"
                       loading="lazy"
@@ -168,7 +169,7 @@ export default function Galerie() {
               className="max-w-7xl w-full h-full flex flex-col items-center justify-center relative"
             >
               <img
-                src={getImageUrl(selectedImage.image_path)}
+                src={resolveImageUrl(selectedImage.image_path)}
                 alt={selectedImage.titre}
                 className="max-h-[75vh] w-auto object-contain shadow-2xl"
               />

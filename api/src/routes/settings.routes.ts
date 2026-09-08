@@ -1,12 +1,13 @@
 import { Hono } from "hono";
-import { eq, inArray, sql } from "drizzle-orm";
+import { inArray, sql } from "drizzle-orm";
 import { db } from "../db/client";
 import { settings } from "../db/schema";
 import { success, error } from "../utils/response";
+import { sendEmail } from "../services/email";
 
 const settingsRoutes = new Hono();
 
-const PUBLIC_KEYS = [
+export const PUBLIC_KEYS = [
   "contact_email",
   "contact_phone",
   "contact_address",
@@ -15,10 +16,14 @@ const PUBLIC_KEYS = [
   "social_instagram",
   "social_twitter",
   "whatsapp_number",
+  "restauration_frais_livraison_gnf",
+  "restauration_acompte_pourcent",
 ] as const;
 
+type PublicKey = (typeof PUBLIC_KEYS)[number];
+
 // Helper de lecture sécurisée du body
-async function parseBody(c: any) {
+async function parseBody(c: any): Promise<Record<string, any> | null> {
   const contentType = c.req.header("content-type") || "";
   try {
     if (
@@ -35,59 +40,159 @@ async function parseBody(c: any) {
 
 // GET /api/v1/settings
 settingsRoutes.get("/", async (c) => {
-  // 1. Filtrage directement au niveau SQL
-  const publicSettings = await db
-    .select()
-    .from(settings)
-    .where(inArray(settings.key, [...PUBLIC_KEYS]));
+  try {
+    // 1. Récupération des données existantes en BDD
+    const publicSettings = await db
+      .select()
+      .from(settings)
+      .where(inArray(settings.key, [...PUBLIC_KEYS]));
 
-  const map = publicSettings.reduce(
-    (acc, curr) => {
-      acc[curr.key] = curr.value || "";
-      return acc;
-    },
-    {} as Record<string, string>,
-  );
+    // 2. Initialisation du dictionnaire avec des valeurs par défaut vides pour TOUTES les clés
+    const map: Record<PublicKey, string> = PUBLIC_KEYS.reduce(
+      (acc, key) => {
+        acc[key] = "";
+        return acc;
+      },
+      {} as Record<PublicKey, string>,
+    );
 
-  return success(c, { map });
+    // 3. Injection des valeurs trouvées en BDD
+    for (const item of publicSettings) {
+      if (item.key in map) {
+        map[item.key as PublicKey] = item.value || "";
+      }
+    }
+
+    return success(c, { map });
+  } catch (err) {
+    console.error("Erreur GET settings:", err);
+    return error(c, "Impossible de récupérer les paramètres", 500);
+  }
+});
+
+// POST /api/v1/settings/bulk
+settingsRoutes.post("/bulk", async (c) => {
+  const body = await parseBody(c);
+  if (!body || typeof body !== "object" || !body.settings || typeof body.settings !== "object") {
+    return error(c, "Données de paramètres invalides", 400);
+  }
+
+  const settingsData = body.settings as Record<string, unknown>;
+  const allowedKeys = [
+    ...PUBLIC_KEYS,
+    "smtp_host",
+    "smtp_port",
+    "smtp_email",
+    "smtp_password",
+    "smtp_secure",
+    "notification_email",
+    "restauration_frais_livraison_gnf",
+    "restauration_acompte_pourcent",
+  ];
+
+  const valuesToInsert = Object.keys(settingsData)
+    .filter((key) => allowedKeys.includes(key))
+    .map((key) => ({
+      key,
+      value: String(settingsData[key] ?? ""),
+      updated_at: new Date(),
+    }));
+
+  if (valuesToInsert.length === 0) {
+    return error(c, "Aucune clé valide à mettre à jour", 400);
+  }
+
+  try {
+    await db
+      .insert(settings)
+      .values(valuesToInsert)
+      .onConflictDoUpdate({
+        target: settings.key,
+        set: {
+          value: sql`EXCLUDED.value`,
+          updated_at: sql`CURRENT_TIMESTAMP`,
+        },
+      });
+
+    return success(c, { updated: valuesToInsert.length }, "Paramètres enregistrés avec succès");
+  } catch (err) {
+    console.error("Erreur POST settings/bulk:", err);
+    return error(c, "Impossible de sauvegarder les paramètres", 500);
+  }
+});
+
+// POST /api/v1/settings/test-email
+settingsRoutes.post("/test-email", async (c) => {
+  const body = await parseBody(c);
+  if (!body || typeof body !== "object" || !body.email) {
+    return error(c, "Adresse e-mail de test requise", 400);
+  }
+
+  const email = String(body.email).trim();
+  if (!email) {
+    return error(c, "Adresse e-mail de test invalide", 400);
+  }
+
+  try {
+    const sent = await sendEmail(
+      email,
+      "Test SMTP MACOF Holding",
+      `<p>Ceci est un test d'envoi SMTP depuis l'API MACOF Holding.</p>`,
+    );
+
+    if (!sent) {
+      return error(c, "Impossible d'envoyer l'e-mail de test. Vérifiez la configuration SMTP.", 500);
+    }
+
+    return success(c, null, "E-mail de test envoyé avec succès");
+  } catch (err) {
+    console.error("Erreur POST settings/test-email:", err);
+    return error(c, "Erreur lors de l'envoi de l'e-mail de test", 500);
+  }
 });
 
 // PUT /api/v1/settings
 settingsRoutes.put("/", async (c) => {
-  const body = await parseBody(c);
+  try {
+    const body = await parseBody(c);
 
-  if (!body || typeof body !== "object") {
-    return error(c, "Corps de requête invalide", 400);
+    if (!body || typeof body !== "object") {
+      return error(c, "Corps de requête invalide", 400);
+    }
+
+    // Filtrer pour ne garder que les clés autorisées
+    const keysToUpdate = Object.keys(body).filter((k) =>
+      (PUBLIC_KEYS as readonly string[]).includes(k),
+    );
+
+    if (keysToUpdate.length === 0) {
+      return error(c, "Aucune clé valide à mettre à jour", 400);
+    }
+
+    // Préparation des objets d'insertion/upsert
+    const valuesToInsert = keysToUpdate.map((key) => ({
+      key,
+      value: String(body[key] ?? ""),
+      updated_at: new Date(),
+    }));
+
+    // Upsert atomique (en 1 seule requête SQL)
+    await db
+      .insert(settings)
+      .values(valuesToInsert)
+      .onConflictDoUpdate({
+        target: settings.key,
+        set: {
+          value: sql`EXCLUDED.value`,
+          updated_at: sql`CURRENT_TIMESTAMP`,
+        },
+      });
+
+    return success(c, { message: "Settings mis à jour avec succès" });
+  } catch (err) {
+    console.error("Erreur PUT settings:", err);
+    return error(c, "Erreur lors de la mise à jour des paramètres", 500);
   }
-
-  const keysToUpdate = Object.keys(body).filter((k) =>
-    PUBLIC_KEYS.includes(k as any),
-  );
-
-  if (keysToUpdate.length === 0) {
-    return error(c, "Aucune clé valide à mettre à jour", 400);
-  }
-
-  // 2. Préparation du tableau d'upsert
-  const valuesToInsert = keysToUpdate.map((key) => ({
-    key,
-    value: String(body[key] ?? ""),
-    updated_at: new Date(),
-  }));
-
-  // 3. Upsert en 1 seule requête SQL (suppose que 'key' a une contrainte UNIQUE ou est clé primaire)
-  await db
-    .insert(settings)
-    .values(valuesToInsert)
-    .onConflictDoUpdate({
-      target: settings.key,
-      set: {
-        value: sql`EXCLUDED.value`,
-        updated_at: new Date(),
-      },
-    });
-
-  return success(c, { message: "Settings updated successfully" });
 });
 
 export default settingsRoutes;

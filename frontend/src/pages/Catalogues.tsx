@@ -12,12 +12,15 @@ const fallbackCatalogues = [
   { id: 3, titre: 'Catalogue Restauration', description: 'Nos offres de restauration', filiale: 'MACOF Restauration', file_path: '#' },
 ];
 
+const plaquettePublicUrl = '/plaquette-macof-holding.pdf';
+
 export default function Catalogues() {
   const [documents, setDocuments] = useState<any[]>([]);
   const [selectedDoc, setSelectedDoc] = useState<any | null>(null);
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
   const [whatsappUrl, setWhatsappUrl] = useState('');
+  const [leadForm, setLeadForm] = useState({ nom: '', email: '', telephone: '' });
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +58,7 @@ export default function Catalogues() {
     setSelectedDoc(doc);
     setDownloadStatus('idle');
     setWhatsappUrl('');
+    setLeadForm({ nom: '', email: '', telephone: '' });
   };
 
   const handleDownload = async () => {
@@ -62,9 +66,9 @@ export default function Catalogues() {
     try {
       // Send lead data to API first
       const response = await api.post('/demandes', {
-        nom_complet: selectedDoc.leadForm?.nom || 'Visiteur',
-        email: selectedDoc.leadForm?.email || '',
-        telephone: selectedDoc.leadForm?.telephone || '',
+        nom_complet: leadForm.nom,
+        email: leadForm.email,
+        telephone: leadForm.telephone,
         objet: `Demande de catalogue: ${selectedDoc.titre}`,
         message: `Téléchargement du catalogue ${selectedDoc.titre}`,
         type_demande: 'information',
@@ -92,6 +96,25 @@ export default function Catalogues() {
         </div>
 
         {error && <p className="text-red-500 text-center mb-8">Erreur de chargement des catalogues</p>}
+
+        <div className="mb-8 rounded-2xl border border-primary/30 bg-primary/5 p-6 backdrop-blur-sm">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-blue-200 mb-2">Document officiel</p>
+              <h2 className="text-2xl md:text-3xl font-serif text-white">Plaquette MACOF Holding</h2>
+            </div>
+            <a
+              href={plaquettePublicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-primary/60 bg-primary/15 px-5 py-3 text-sm font-medium text-white transition hover:bg-primary hover:text-black"
+            >
+              <Download className="w-4 h-4" />
+              Télécharger le PDF
+            </a>
+          </div>
+        </div>
 
         <div className="space-y-4">
           {documents.map((doc) => (
@@ -163,15 +186,15 @@ export default function Catalogues() {
                 <div className="space-y-4 mb-8">
                   <div className="space-y-2">
                     <label className="text-xs uppercase tracking-widest text-white/50">Nom / Société *</label>
-                    <Input required placeholder="Votre nom" className="bg-background border-white/10 text-white placeholder:text-white/30" />
+                    <Input required placeholder="Votre nom" value={leadForm.nom} onChange={(e) => setLeadForm({ ...leadForm, nom: e.target.value })} className="bg-background border-white/10 text-white placeholder:text-white/30" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs uppercase tracking-widest text-white/50">Email Professionnel *</label>
-                    <Input required type="email" placeholder="email@domaine.com" className="bg-background border-white/10 text-white placeholder:text-white/30" />
+                    <Input required type="email" placeholder="email@domaine.com" value={leadForm.email} onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })} className="bg-background border-white/10 text-white placeholder:text-white/30" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs uppercase tracking-widest text-white/50">Téléphone (Optionnel)</label>
-                    <Input placeholder="+224 ..." className="bg-background border-white/10 text-white placeholder:text-white/30" />
+                    <Input placeholder="+224 ..." value={leadForm.telephone} onChange={(e) => setLeadForm({ ...leadForm, telephone: e.target.value })} className="bg-background border-white/10 text-white placeholder:text-white/30" />
                   </div>
                 </div>
 
