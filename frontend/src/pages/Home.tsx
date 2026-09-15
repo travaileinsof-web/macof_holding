@@ -85,10 +85,10 @@ const MACOF_DATA: MacofData = {
   ],
 
   realisations: [
-    { title: "Développement Foncier", category: "Immobilier", image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop" },
-    { title: "Gastronomie de Luxe", category: "Restauration", image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1000&auto=format&fit=crop" },
-    { title: "Extraction Minière", category: "Mining", image: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=1000&auto=format&fit=crop" },
-    { title: "Campagnes Marketing", category: "Print", image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1000&auto=format&fit=crop" }
+    { title: "Développement Foncier", category: "Immobilier", image: "https://media.istockphoto.com/id/1572513989/photo/african-couple-viewing-real-estate-house.jpg?s=612x612&w=0&k=20" },
+    { title: "Design & Aménagement", category: "Immobilier", image: "https://media.istockphoto.com/id/522336505/photo/happy-couple-at-homeware-store.webp?a=1&b=1&s=612x612&w=0&k=20&c=5ZKkTJadks8bitjWzlWKDrddNESsdzsleXUFgoLCBvU=" },
+    { title: "Architecture d'Intérieur", category: "Immobilier", image: "https://media.istockphoto.com/id/1358799929/photo/young-couple-consulting-with-interior-designer.webp?a=1&b=1&s=612x612&w=0&k=20&c=4P02nWGGQP1xuJ3MF-jpuxHmSjSv875178bXyTfvQnM=" },
+    { title: "Gestion de Biens", category: "Immobilier", image: "https://media.istockphoto.com/id/1572514012/photo/african-couple-viewing-real-estate-house.webp?a=1&b=1&s=612x612&w=0&k=20&c=_D-nrY18IaQCjce0jJGeONSqbuQ-6iCQM8X4qlnxw0g=" }
   ],
 
   partenaires: [
