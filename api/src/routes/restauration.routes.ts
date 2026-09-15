@@ -53,7 +53,7 @@ function normalizeMenuBody(body: any) {
     disponible: body.disponible === true || body.disponible === "true",
     updated_at: new Date(),
   };
-  if (body.image_url) normalized.image_url = String(body.image_url);
+  if (body.image_url) normalized.image_url = String(body.image_url); if (body.video_url !== undefined) normalized.video_url = body.video_url ? String(body.video_url) : null;
   return normalized;
 }
 
