@@ -55,7 +55,7 @@ export function Navbar() {
               <Link to="/catalogues" className="text-[10px] font-sans text-white/80 hover:text-white transition-colors tracking-[0.2em] uppercase">Documents</Link>
             </div>
 
-            <div className="hidden lg:flex items-center">
+            <div className="hidden lg:flex items-center gap-6">
               <CartNavbarLink />
               <Link to="/contact">
                 <Button variant="outline" size="sm" className="text-[10px] tracking-widest uppercase px-6 border-white/50 text-white hover:bg-white hover:text-black">
