@@ -103,14 +103,14 @@ const MACOF_DATA: MacofData = {
       poste: "Directeur des Opérations", 
       entreprise: "Groupe Bolloré", 
       message: "L'expertise de MACOF dans la gestion logistique et le transit a radicalement amélioré nos délais de livraison. Un partenaire de confiance absolu.",
-      avatar_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop"
+      avatar_url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop"
     },
     { 
       nom: "Aminata Diallo", 
       poste: "CEO", 
       entreprise: "Global Trade Africa", 
       message: "Nous collaborons avec MACOF Immobilier depuis 3 ans sur des projets d'envergure. Leur rigueur et leur respect des normes internationales sont exemplaires.",
-      avatar_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop"
+      avatar_url: "https://images.unsplash.com/photo-1531123897727-8f129e1bf98c?q=80&w=200&auto=format&fit=crop"
     }
   ]
 };
@@ -533,7 +533,7 @@ export default function Home() {
 
         {/* SECTION CTA FINAL */}
         <section className="py-32 bg-red-600 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2000&auto=format&fit=crop')] mix-blend-multiply opacity-20 object-cover" />
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2000&auto=format&fit=crop')] mix-blend-multiply opacity-20 object-cover" />
           <div className="relative z-10 max-w-4xl mx-auto px-6">
             <h2 className="text-4xl md:text-6xl font-serif text-white mb-8 font-light">Prêt à construire l'avenir ensemble ?</h2>
             <p className="text-red-100 mb-12 text-xl font-light">Que vous cherchiez un partenariat B2B stratégique ou des services de très haute qualité, notre groupe est à votre écoute.</p>

@@ -267,7 +267,7 @@ async function seed() {
       page_slug: "about",
       section_key: "hero_img",
       content_value:
-        "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000&auto=format&fit=crop",
       content_type: "text",
     },
     {
