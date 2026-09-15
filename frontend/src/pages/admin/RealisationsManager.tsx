@@ -206,7 +206,7 @@ export default function RealisationsManager() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Supprimer cette r\u00e9alisation ?')) return;
+    if (!confirm('Supprimer cette réalisation ?')) return;
     setSaving(true);
     try {
       const updatedArray = realisations.filter(r => r.id !== id);
@@ -225,8 +225,8 @@ export default function RealisationsManager() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-200">R\u00e9alisations par Filiale</h2>
-          <p className="text-slate-400 text-sm mt-1">G\u00e9rez les projets sp\u00e9cifiques affich\u00e9s sur les pages des filiales.</p>
+          <h2 className="text-2xl font-bold text-slate-200">Réalisations par Filiale</h2>
+          <p className="text-slate-400 text-sm mt-1">Gérez les projets spécifiques affichés sur les pages des filiales.</p>
         </div>
         <button
           onClick={openCreateModal}
@@ -234,14 +234,14 @@ export default function RealisationsManager() {
           className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Ajouter une r\u00e9alisation
+          Ajouter une réalisation
         </button>
       </div>
 
       {/* Filter / Filiale Selection */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#1e293b] p-4 rounded-lg border border-slate-700">
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">S\u00e9lectionner une filiale</label>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Sélectionner une filiale</label>
           <select
             value={selectedSlug}
             onChange={(e) => setSelectedSlug(e.target.value)}
@@ -295,7 +295,7 @@ export default function RealisationsManager() {
           {realisations.length === 0 && (
             <div className="col-span-full text-center py-12 text-slate-500 bg-[#1e293b] border border-slate-700 rounded-lg">
               <ImageIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Aucune r\u00e9alisation pour cette filiale.</p>
+              <p>Aucune réalisation pour cette filiale.</p>
             </div>
           )}
         </div>
@@ -306,7 +306,7 @@ export default function RealisationsManager() {
           <div className="bg-[#1e293b] border border-slate-700 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
               <h3 className="text-lg font-semibold text-slate-200">
-                {editId ? 'Modifier la r\u00e9alisation' : 'Ajouter une r\u00e9alisation'}
+                {editId ? 'Modifier la réalisation' : 'Ajouter une réalisation'}
               </h3>
               <button onClick={closeModal} className="text-slate-400 hover:text-white">
                 <X className="h-5 w-5" />

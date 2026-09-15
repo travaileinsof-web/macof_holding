@@ -296,14 +296,14 @@ export default function Print() {
                 {realisations.map((item: any, idx: number) => (
                   <div key={idx} className="group relative overflow-hidden aspect-[3/4] bg-gray-100">
                     <img
-                      src={getImageUrl(item.image)}
-                      alt={item.titre}
+                      src={getImageUrl(item.image || item.image_path)}
+                      alt={(item.title || item.titre)}
                       className="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700"
                       onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
                     />
                     <div className="absolute inset-0 bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-6 text-center">
                       <span className="text-blue-900 text-xs font-sans tracking-widest uppercase mb-4">{item.type_projet || 'Design'}</span>
-                      <h4 className="text-gray-900 text-2xl font-serif">{item.titre}</h4>
+                      <h4 className="text-gray-900 text-2xl font-serif">{(item.title || item.titre)}</h4>
                     </div>
                   </div>
                 ))}
