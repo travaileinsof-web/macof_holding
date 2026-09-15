@@ -346,7 +346,7 @@ export default function Home() {
               <div className="reveal-up relative">
                 <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1000&auto=format&fit=crop" 
+                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000&auto=format&fit=crop" 
                     alt="Bureau Corporate" 
                     className="w-full h-full object-cover" 
                   />
