@@ -8,21 +8,18 @@ async function main() {
   await db.update(galerie).set({
     image_url: "https://media.istockphoto.com/id/1572513989/photo/african-couple-viewing-real-estate-house.jpg?s=612x612&w=0&k=20",
     titre: "Développement Foncier",
-    type_projet: "Immobilier",
     description: "Projet résidentiel d'envergure, standing international."
   }).where(eq(galerie.id, 1));
 
   await db.update(galerie).set({
     image_url: "https://media.istockphoto.com/id/522336505/photo/happy-couple-at-homeware-store.webp?a=1&b=1&s=612x612&w=0&k=20&c=5ZKkTJadks8bitjWzlWKDrddNESsdzsleXUFgoLCBvU=",
     titre: "Design & Aménagement",
-    type_projet: "Immobilier",
     description: "Création d'espaces de vie modernes et confortables."
   }).where(eq(galerie.id, 2));
 
   await db.update(galerie).set({
     image_url: "https://media.istockphoto.com/id/1358799929/photo/young-couple-consulting-with-interior-designer.webp?a=1&b=1&s=612x612&w=0&k=20&c=4P02nWGGQP1xuJ3MF-jpuxHmSjSv875178bXyTfvQnM=",
     titre: "Architecture d'Intérieur",
-    type_projet: "Immobilier",
     description: "Consultation et accompagnement sur-mesure."
   }).where(eq(galerie.id, 3));
 
