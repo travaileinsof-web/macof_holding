@@ -8,6 +8,9 @@ export function Footer() {
 
   return (
     <footer className="bg-[#050b14] border-t border-white/10 relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 bg-[url('https://media.istockphoto.com/id/1127533037/photo/attractive-smiling-people-are-in-the-street-festival.jpg?s=612x612&w=0&k=20&c=qw0cf3q7lR0uSEfLTMa1_L-aAQ8H4YGko-O5ESm-8Jg=')] bg-cover bg-center mix-blend-overlay opacity-10" />
+      
       {/* Background decorative element */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#0A4287]/50 to-transparent" />
       <div className="absolute bottom-0 right-0 w-1/3 h-full bg-[#0A4287]/5 blur-[120px] pointer-events-none" />
