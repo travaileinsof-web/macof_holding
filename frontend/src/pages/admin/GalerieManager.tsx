@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../lib/api';
 import { AdminPage } from '../../components/ui/AdminPage';
+import { ConfirmModal } from '../../components/ui/ConfirmModal';
 import { getImageUrl } from '../../lib/utils';
 
 interface GalerieItem {
@@ -201,7 +202,7 @@ export default function GalerieManager() {
                   loading="lazy"
                 />
                 <button
-                  onClick={() => handleDelete(img.id)}
+                  onClick={() => setItemToDelete(img.id)}
                   className="absolute top-2 right-2 bg-red-600 hover:bg-red-500 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -343,3 +344,4 @@ export default function GalerieManager() {
     </AdminPage>
   );
 }
+
