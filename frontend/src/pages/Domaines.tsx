@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const FALLBACK_DOMAINES = [
   {
-    id: '01', title: "MACOF Immobilier SARL", subtitle: "Immobilier & BTP", desc: "Investissement immobilier, promotion foncière, construction de bâtiments et gestion de chantiers publics/privés de grande envergure.", details: ["Promotion immobilière", "Travaux publics", "Architecture urbaine", "Gestion locative"], link: "/immobilier", img: "https://images.unsplash.com/photo-1541888081119-74d156828551?q=80&w=2070&auto=format&fit=crop"
+    id: '01', title: "MACOF Immobilier SARL", subtitle: "Immobilier & BTP", desc: "Investissement immobilier, promotion foncière, construction de bâtiments et gestion de chantiers publics/privés de grande envergure.", details: ["Promotion immobilière", "Travaux publics", "Architecture urbaine", "Gestion locative"], link: "/immobilier", img: "https://media.istockphoto.com/id/2151134721/photo/happy-group-of-business-people-standing.jpg?s=612x612&w=0&k=20&c=iTFwKo-IkwoBxrpb-BqwyUR6bK3DrCnnw3pB_wQN-O0="
   },
   {
     id: '02', title: "SEBA International", subtitle: "Restauration & Gastronomie", desc: "Service traiteur premium, restauration d'entreprise et événementielle de très haut niveau, soutenue par une exigence stricte de qualité et de sécurité alimentaire.", details: ["Service Traiteur VIP", "Boulangerie & Pâtisserie", "Restauration Collective", "Événementiel Gastronomique"], link: "/restauration", img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2070&auto=format&fit=crop"
