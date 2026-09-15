@@ -3,6 +3,7 @@ import { ImageOff, Pencil, Plus, Trash2 } from 'lucide-react';
 import { api } from '../../lib/api';
 import { AdminPage } from '../../components/ui/AdminPage';
 import { useInfiniteReveal } from '../../hooks/useInfiniteReveal';
+import { ConfirmModal } from '../../components/ui/ConfirmModal';
 
 type Product = {
   id: number;
@@ -179,7 +180,7 @@ export default function MenuProduitsPage() {
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
-                      <button title="Supprimer" onClick={() => remove(product.id)} className="text-red-400">
+                      <button title="Supprimer" onClick={() => setItemToDelete(product.id)} className="text-red-400">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -306,6 +307,14 @@ export default function MenuProduitsPage() {
           </div>
         ) : null}
       </div>
+      <ConfirmModal
+        isOpen={itemToDelete !== null}
+        title="Supprimer le produit"
+        message="Êtes-vous sûr de vouloir supprimer ce plat ? Cette action est irréversible."
+        confirmText="Supprimer"
+        onConfirm={confirmRemove}
+        onCancel={() => setItemToDelete(null)}
+      />
     </AdminPage>
   );
 }

@@ -158,6 +158,13 @@ adminRestaurationRoutes.put("/commandes/:id/paiement", async (c) => {
     : error(c, "Commande introuvable", 404);
 });
 
+adminRestaurationRoutes.delete("/commandes/:id", async (c) => {
+  const orderId = Number(c.req.param("id"));
+  await db.delete(lignes_commandes).where(eq(lignes_commandes.commande_id, orderId));
+  const [order] = await db.delete(commandes).where(eq(commandes.id, orderId)).returning();
+  return order ? success(c, order, "Commande supprimée") : error(c, "Commande introuvable", 404);
+});
+
 // ─── Types Djomy ─────────────────────────────────────────────────────────────
 
 interface DjomyAuthResponse {
@@ -812,3 +819,5 @@ restaurationRoutes.post("/djomy-webhook", async (c) => {
 });
 
 export default restaurationRoutes;
+
+
