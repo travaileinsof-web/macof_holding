@@ -89,7 +89,7 @@ export default function PublicMenu() {
   }
 
   return (
-    <section id="menu-commande" className="py-32 bg-[#050505] relative overflow-hidden">
+    <section id="menu-commande" className="py-24 bg-background relative overflow-hidden border-b border-white/5">
       {/* Background abstract elements */}
       <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-900/10 to-transparent pointer-events-none" />
       <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
@@ -311,3 +311,4 @@ export default function PublicMenu() {
     </section>
   );
 }
+

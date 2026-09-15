@@ -124,6 +124,8 @@ export default function Restauration() {
           </div>
         </section>
 
+        <PublicMenu />
+
         {/* Philosophie & SEBA International */}
         <section className="content-section py-32 bg-background relative border-b border-white/5">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -224,9 +226,9 @@ export default function Restauration() {
           </div>
         </section>
 
-        <PublicMenu />
-
       </div>
     </AnimatedPage>
   );
 }
+
+
