@@ -11,6 +11,7 @@ import {
 import { AdminPage } from '../../components/ui/AdminPage';
 import { api } from '../../lib/api';
 import { getImageUrl } from '../../lib/utils';
+import { Link } from 'react-router-dom';
 
 interface Filiale {
   id: number;
@@ -227,6 +228,12 @@ export default function RealisationsManager() {
         <div>
           <h2 className="text-2xl font-bold text-slate-200">Réalisations par Filiale</h2>
           <p className="text-slate-400 text-sm mt-1">Gérez les projets spécifiques affichés sur les pages des filiales.</p>
+          <p className="text-slate-500 text-xs mt-2">
+            Pour les images de la galerie publique, utilisez{' '}
+            <Link to="/admin/galerie" className="text-amber-400 hover:text-amber-300 underline underline-offset-2">
+              la gestion de la Galerie
+            </Link>.
+          </p>
         </div>
         <button
           onClick={openCreateModal}

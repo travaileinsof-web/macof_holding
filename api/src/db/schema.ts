@@ -267,6 +267,7 @@ export const produits_menu = pgTable(
     categorie: produitCategorieEnum("categorie").notNull(),
     prix_gnf: integer("prix_gnf").notNull(),
     image_url: text("image_url"),
+    video_url: text("video_url"),
     disponible: boolean("disponible").default(true).notNull(),
     archived: boolean("archived").default(false).notNull(),
     created_at: timestamp("created_at", { withTimezone: true })

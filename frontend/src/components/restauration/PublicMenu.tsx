@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Plus, Check } from 'lucide-react';
+import { ShoppingBag, Plus, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '../../lib/api';
 import { useCart } from './CartContext';
 import { getImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../lib/utils';
@@ -13,6 +13,7 @@ interface Product {
   categorie: string;
   prix_gnf: number;
   image_url?: string | null;
+  video_url?: string | null;
   disponible: boolean;
 }
 
@@ -23,10 +24,16 @@ const CATEGORIES = [
   { id: 'boissons', label: 'Boissons & Cocktails' }
 ];
 
+const ITEMS_PER_PAGE = 8;
+
 export default function PublicMenu() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  
   const { add } = useCart();
   const [addedItems, setAddedItems] = useState<Record<number, boolean>>({});
 
@@ -46,6 +53,11 @@ export default function PublicMenu() {
     fetchMenu();
   }, []);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, searchQuery]);
+
   const handleAdd = (product: Product) => {
     add(product);
     setAddedItems((prev) => ({ ...prev, [product.id]: true }));
@@ -55,9 +67,18 @@ export default function PublicMenu() {
     }, 2000);
   };
 
-  const filteredProducts = activeCategory === 'all'
-    ? products
-    : products.filter(p => p.categorie === activeCategory);
+  const filteredProducts = products.filter(p => {
+    const matchesCategory = activeCategory === 'all' || p.categorie === activeCategory;
+    const matchesSearch = p.nom.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE, 
+    currentPage * ITEMS_PER_PAGE
+  );
 
   if (loading) {
     return (
@@ -77,7 +98,7 @@ export default function PublicMenu() {
       <div className="max-w-[100rem] mx-auto px-6 lg:px-12 relative z-10">
         
         {/* Header Section */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -98,33 +119,54 @@ export default function PublicMenu() {
           </motion.div>
         </div>
 
-        {/* Categories Filter */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-3 mb-16"
-        >
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-6 py-3 rounded-full text-sm font-sans tracking-wide transition-all duration-300 border ${
-                activeCategory === cat.id
-                  ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]'
-                  : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/30'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </motion.div>
+        {/* Search & Categories */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+          {/* Categories Filter */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-wrap gap-3"
+          >
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-5 py-2.5 rounded-full text-sm font-sans tracking-wide transition-all duration-300 border ${
+                  activeCategory === cat.id
+                    ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                    : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/30'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </motion.div>
+
+          {/* Search Bar */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="relative w-full md:w-72"
+          >
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-white/40" />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher un plat..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-full py-2.5 pl-11 pr-4 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-colors"
+            />
+          </motion.div>
+        </div>
 
         {/* Products Grid */}
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <AnimatePresence mode="popLayout">
-            {filteredProducts.map((product) => (
+            {paginatedProducts.map((product) => (
               <motion.div
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -132,20 +174,38 @@ export default function PublicMenu() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4, type: 'spring', bounce: 0.3 }}
                 key={product.id}
+                onMouseEnter={() => setHoveredProduct(product.id)}
+                onMouseLeave={() => setHoveredProduct(null)}
                 className="group relative flex flex-col h-full bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden hover:bg-white/[0.04] hover:border-white/20 transition-all duration-500"
               >
-                {/* Image Section */}
+                {/* Image / Video Section */}
                 <div className="relative h-64 overflow-hidden bg-black/20">
                   <img
                     src={getImageUrl(product.image_url || DEFAULT_FALLBACK_IMAGE)}
                     alt={product.nom}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                    className={`w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out ${
+                      hoveredProduct === product.id && product.video_url ? 'opacity-0' : 'opacity-100'
+                    }`}
                     onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
                   />
+                  
+                  {product.video_url && (
+                    <video
+                      src={product.video_url}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                        hoveredProduct === product.id ? 'opacity-100' : 'opacity-0'
+                      }`}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
+                  )}
+
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
                   
                   {/* Category Badge */}
-                  <div className="absolute top-4 left-4">
+                  <div className="absolute top-4 left-4 z-10">
                     <span className="px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-full text-[10px] uppercase tracking-widest text-white/80 font-sans">
                       {product.categorie}
                     </span>
@@ -199,11 +259,51 @@ export default function PublicMenu() {
           </AnimatePresence>
         </motion.div>
 
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center items-center gap-4">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-full border border-white/10 text-white/60 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`w-8 h-8 rounded-full text-sm font-sans flex items-center justify-center transition-colors ${
+                    currentPage === i + 1
+                      ? 'bg-white text-black'
+                      : 'border border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-full border border-white/10 text-white/60 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
+
+        {/* Empty State */}
         {filteredProducts.length === 0 && (
           <div className="py-20 text-center">
             <ShoppingBag className="mx-auto h-12 w-12 text-white/20 mb-4" />
             <h3 className="text-xl text-white font-serif mb-2">Aucun produit trouvé</h3>
-            <p className="text-white/50 font-sans">Cette catégorie est actuellement vide.</p>
+            <p className="text-white/50 font-sans">
+              {searchQuery ? `Aucun résultat pour "${searchQuery}"` : "Cette catégorie est actuellement vide."}
+            </p>
           </div>
         )}
 

@@ -23,6 +23,15 @@ const FALLBACK_GALERIE = [
   { id: 10, filiale: "MACOF Fishing", titre: "Traitement Produits", image_path: "https://images.unsplash.com/photo-1574781330855-d0db8cc6a79c?q=80&w=1000&auto=format&fit=crop", desc: "Usines de filetage certifiées." }
 ];
 
+const FILIALE_PAGES = [
+  { slug: 'restauration', nom: 'SEBA International' },
+  { slug: 'immobilier', nom: 'MACOF Immobilier SARL' },
+  { slug: 'fishing', nom: 'MACOF Fishing SARL' },
+  { slug: 'transit', nom: 'MACOF Transit SARL' },
+  { slug: 'print', nom: 'MACOF Print & Com SARL' },
+  { slug: 'mining', nom: 'MACOF Mining SARL' },
+];
+
 export default function Galerie() {
   const [activeFilter, setActiveFilter] = useState("Tous");
   const [selectedImage, setSelectedImage] = useState<any | null>(null);
@@ -31,14 +40,42 @@ export default function Galerie() {
     queryKey: ['galerieData'],
     queryFn: async () => {
       try {
-        const res = await api.get('/galerie');
-        if (res.data.success) {
-          const data = res.data.data;
-          const items = Array.isArray(data) ? data : (data.items || []);
-          if (items.length > 0) return items;
-        }
+        const responses = await Promise.all(
+          FILIALE_PAGES.map(async (filiale) => {
+            try {
+              const res = await api.get(`/pages/${filiale.slug}`);
+              return res.data?.success ? { filiale, data: res.data.data } : null;
+            } catch {
+              return null;
+            }
+          })
+        );
+
+        const realisations = responses.flatMap((response) => {
+          const value = response?.data?.realisations;
+          let items: any[] = [];
+
+          try {
+            const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+            items = Array.isArray(parsed) ? parsed : [];
+          } catch {
+            items = [];
+          }
+
+          return items
+            .filter((item) => item?.image)
+            .map((item, index) => ({
+              id: `${response!.filiale.slug}-${item.id || index}`,
+              filiale: response!.filiale.nom,
+              titre: item.title || item.titre || 'Réalisation',
+              image_path: item.image || item.image_path,
+              desc: item.desc || item.description_courte || item.description || '',
+            }));
+        });
+
+        if (realisations.length > 0) return realisations;
       } catch (err) {
-        console.warn("API Error galerie, using fallback");
+        console.warn("API Error réalisations, using fallback");
       }
       return FALLBACK_GALERIE;
     },

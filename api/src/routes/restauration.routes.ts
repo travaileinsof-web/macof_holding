@@ -109,7 +109,7 @@ adminRestaurationRoutes.get("/commandes", async (c) => {
       commande_id: lignes_commandes.commande_id,
       nom_produit: lignes_commandes.nom_produit,
       quantite: lignes_commandes.quantite,
-      image_url: produits_menu.image_url,
+      image_url: produits_menu.image_url, video_url: produits_menu.video_url,
     })
     .from(lignes_commandes)
     .leftJoin(produits_menu, eq(lignes_commandes.produit_id, produits_menu.id))
@@ -412,7 +412,7 @@ restaurationRoutes.get("/menu", async (c) => {
         description: produits_menu.description,
         categorie: produits_menu.categorie,
         prix_gnf: produits_menu.prix_gnf,
-        image_url: produits_menu.image_url,
+        image_url: produits_menu.image_url, video_url: produits_menu.video_url,
         disponible: produits_menu.disponible,
         archived: produits_menu.archived,
       })
@@ -443,7 +443,7 @@ restaurationRoutes.get("/menu/:id", async (c) => {
         description: produits_menu.description,
         categorie: produits_menu.categorie,
         prix_gnf: produits_menu.prix_gnf,
-        image_url: produits_menu.image_url,
+        image_url: produits_menu.image_url, video_url: produits_menu.video_url,
         disponible: produits_menu.disponible,
         archived: produits_menu.archived,
       })
