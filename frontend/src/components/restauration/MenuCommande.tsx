@@ -94,7 +94,7 @@ export default function MenuCommandesPage() {
 
   const confirmRemoveOrder = async () => {
     if (!orderToDelete) return;
-    await api.delete(/api/v1/admin/restauration/commandes/${orderToDelete});
+    await api.delete(`/api/v1/admin/restauration/commandes/${orderToDelete}`);
     setOrderToDelete(null);
     await load();
   };
@@ -229,5 +229,7 @@ export default function MenuCommandesPage() {
     </AdminPage>
   );
 }
+
+
 
 
