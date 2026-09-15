@@ -533,7 +533,7 @@ export default function Home() {
 
         {/* SECTION CTA FINAL */}
         <section className="py-32 bg-red-600 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2000&auto=format&fit=crop')] mix-blend-multiply opacity-20 object-cover" />
+          <div className="absolute inset-0 bg-[url('https://media.istockphoto.com/id/1179885419/photo/four-confident-african-american-male-and-female-professionals-standing-together-in-bright.jpg?s=612x612&w=0&k=20&c=MFHVh3PYGxbqyRC02_ECSwX7ABfMA4ptgGw_eJ7V3w8=')] mix-blend-multiply opacity-20 object-cover" />
           <div className="relative z-10 max-w-4xl mx-auto px-6">
             <h2 className="text-4xl md:text-6xl font-serif text-white mb-8 font-light">Prêt à construire l'avenir ensemble ?</h2>
             <p className="text-red-100 mb-12 text-xl font-light">Que vous cherchiez un partenariat B2B stratégique ou des services de très haute qualité, notre groupe est à votre écoute.</p>
