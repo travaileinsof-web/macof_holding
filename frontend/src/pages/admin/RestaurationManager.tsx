@@ -44,6 +44,7 @@ function Thumb({ src, alt, size = 48 }: { src?: string; alt: string; size?: numb
 
 export default function MenuProduitsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -123,9 +124,10 @@ export default function MenuProduitsPage() {
     await load();
   };
 
-  const remove = async (id: number) => {
-    if (!confirm('Supprimer ce plat du menu ?')) return;
-    await api.delete(`/api/v1/admin/restauration/menu/${id}`);
+  const confirmRemove = async () => {
+    if (!itemToDelete) return;
+    await api.delete(`/api/v1/admin/restauration/menu/${itemToDelete}`);
+    setItemToDelete(null);
     await load();
   };
 
@@ -318,5 +320,9 @@ export default function MenuProduitsPage() {
     </AdminPage>
   );
 }
+
+
+
+
 
 
