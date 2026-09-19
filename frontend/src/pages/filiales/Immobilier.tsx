@@ -72,17 +72,15 @@ export default function Immobilier() {
     return () => clearInterval(poll);
   }, []);
 
-  const realisations = useMemo(() => {
-    if (content?.realisations) {
-      try {
-        const parsed = typeof content.realisations === 'string' ? JSON.parse(content.realisations) : content.realisations;
-        if (Array.isArray(parsed)) return parsed;
-      } catch (e) {
-        console.warn('Error parsing realisations JSON');
+  const [realisations, setRealisations] = useState<any[]>([]);
+  useEffect(() => {
+    api.get('/galerie').then(res => {
+      if (res.data.success) {
+        const immoReals = res.data.data.filter((r: any) => r.filiale_nom?.toLowerCase().includes('immobilier'));
+        setRealisations(immoReals);
       }
-    }
-    return [];
-  }, [content?.realisations]);
+    });
+  }, []);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -375,3 +373,5 @@ export default function Immobilier() {
     </AnimatedPage>
   );
 }
+
+

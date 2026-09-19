@@ -103,14 +103,14 @@ const MACOF_DATA: MacofData = {
       poste: "Directeur des Opérations", 
       entreprise: "Groupe Bolloré", 
       message: "L'expertise de MACOF dans la gestion logistique et le transit a radicalement amélioré nos délais de livraison. Un partenaire de confiance absolu.",
-      avatar_url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop"
+      avatar_url: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?q=80&w=200&auto=format&fit=crop"
     },
     { 
       nom: "Aminata Diallo", 
       poste: "CEO", 
       entreprise: "Global Trade Africa", 
       message: "Nous collaborons avec MACOF Immobilier depuis 3 ans sur des projets d'envergure. Leur rigueur et leur respect des normes internationales sont exemplaires.",
-      avatar_url: "https://images.unsplash.com/photo-1531123897727-8f129e1bf98c?q=80&w=200&auto=format&fit=crop"
+      avatar_url: "https://images.unsplash.com/photo-1531123414708-f47c4ce6d654?q=80&w=200&auto=format&fit=crop"
     }
   ]
 };
