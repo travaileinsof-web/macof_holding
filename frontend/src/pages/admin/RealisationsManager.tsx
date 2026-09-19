@@ -20,7 +20,7 @@ interface Filiale {
 }
 
 interface Realisation {
-  id: string; // Unique ID for React keys
+  id: number;
   title: string;
   desc: string;
   image: string;
@@ -64,31 +64,25 @@ export default function RealisationsManager() {
     fetchFiliales();
   }, []);
 
-  // Fetch realisations when selected slug changes
+  // The gallery table is the single source of truth for public realizations.
   useEffect(() => {
     if (!selectedSlug) return;
     const fetchRealisations = async () => {
       setLoading(true);
       try {
-        const res = await api.get(`/api/v1/admin/pages/${selectedSlug}`);
-        if (res.data.success && res.data.data?.sections) {
-          const contents = res.data.data.sections;
-          const realisationsSection = contents.find((c: any) => (c.section_key || c.key) === 'realisations');
-          if (realisationsSection && (realisationsSection.content_value || realisationsSection.value)) {
-            try {
-              const value = realisationsSection.content_value ?? realisationsSection.value;
-              const parsed = typeof value === 'string' ? JSON.parse(value) : value;
-              setRealisations(Array.isArray(parsed) ? parsed : []);
-            } catch (e) {
-              console.error('Erreur parsing JSON realisations:', e);
-              setRealisations([]);
-            }
-          } else {
-            setRealisations([]);
-          }
-        } else {
-          setRealisations([]);
-        }
+        const filiale = filiales.find((item) => item.slug === selectedSlug);
+        const res = await api.get('/api/v1/admin/galerie');
+        const items = res.data.success && Array.isArray(res.data.data) ? res.data.data : [];
+        setRealisations(
+          items
+            .filter((item: any) => item.filiale === filiale?.id)
+            .map((item: any) => ({
+              id: item.id,
+              title: item.titre,
+              desc: item.description_courte || '',
+              image: item.image_path,
+            }))
+        );
       } catch (err) {
         console.error('Erreur fetch realisations:', err);
         setRealisations([]);
@@ -97,24 +91,7 @@ export default function RealisationsManager() {
       }
     };
     fetchRealisations();
-  }, [selectedSlug]);
-
-  const saveToBackend = async (newRealisations: Realisation[]) => {
-    if (!selectedSlug) return;
-    try {
-      await api.post('/api/v1/admin/pages/bulk', {
-        page_slug: selectedSlug,
-        contents: [{
-          section_key: 'realisations',
-          content_value: JSON.stringify(newRealisations),
-          content_type: 'json',
-        }],
-      });
-    } catch (err) {
-      console.error('Erreur sauvegarde realisations:', err);
-      throw err;
-    }
-  };
+  }, [selectedSlug, filiales]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -177,26 +154,31 @@ export default function RealisationsManager() {
         return;
       }
 
-      let updatedArray = [...realisations];
+      const filiale = filiales.find((item) => item.slug === selectedSlug);
+      if (!filiale) throw new Error('Filiale introuvable');
 
-      if (editId) {
-        updatedArray = updatedArray.map(r => 
-          r.id === editId 
-            ? { ...r, title: formTitle, desc: formDesc, image: finalImageUrl }
-            : r
-        );
-      } else {
-        const newItem: Realisation = {
-          id: Date.now().toString(),
-          title: formTitle,
-          desc: formDesc,
-          image: finalImageUrl
-        };
-        updatedArray.push(newItem);
-      }
+      const payload = {
+        titre: formTitle,
+        filiale: filiale.id,
+        description_courte: formDesc,
+        type_projet: 'autre',
+        image_path: finalImageUrl,
+      };
+      const response = editId
+        ? await api.put(`/api/v1/admin/galerie/${editId}`, payload)
+        : await api.post('/api/v1/admin/galerie', payload);
+      if (!response.data.success) throw new Error('Erreur de sauvegarde');
 
-      await saveToBackend(updatedArray);
-      setRealisations(updatedArray);
+      const item = response.data.data;
+      const savedItem = {
+        id: item.id,
+        title: item.titre,
+        desc: item.description_courte || '',
+        image: item.image_path,
+      };
+      setRealisations((current) => editId
+        ? current.map((entry) => entry.id === editId ? savedItem : entry)
+        : [...current, savedItem]);
       closeModal();
     } catch (err) {
       console.error('Erreur save item:', err);
@@ -206,13 +188,12 @@ export default function RealisationsManager() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (!confirm('Supprimer cette réalisation ?')) return;
     setSaving(true);
     try {
-      const updatedArray = realisations.filter(r => r.id !== id);
-      await saveToBackend(updatedArray);
-      setRealisations(updatedArray);
+      await api.delete(`/api/v1/admin/galerie/${id}`);
+      setRealisations((current) => current.filter((item) => item.id !== id));
     } catch (err) {
       console.error('Erreur suppression:', err);
       alert("Erreur lors de la suppression.");

@@ -41,6 +41,7 @@ interface Temoignage {
   entreprise: string;
   message: string;
   avatar_url: string;
+  active?: boolean;
 }
 
 interface MacofData {
@@ -135,7 +136,7 @@ export default function Home() {
         
         if (!isMounted) return;
 
-        let newContent = { ...MACOF_DATA };
+        let newContent = { ...MACOF_DATA, realisations: [], partenaires: [], temoignages: [] };
 
         if (resContent.data?.success && Object.keys(resContent.data.data).length > 0) {
           const fetchedData = { ...resContent.data.data };
@@ -144,8 +145,10 @@ export default function Home() {
             if (fetchedData[key] && typeof fetchedData[key] === 'string') {
               try {
                 const parsed = JSON.parse(fetchedData[key]);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                  fetchedData[key] = parsed;
+                if (Array.isArray(parsed)) {
+                  fetchedData[key] = key === 'temoignages'
+                    ? parsed.map((item: Temoignage) => ({ ...item, active: item.active !== false }))
+                    : parsed;
                 } else {
                   delete fetchedData[key];
                 }
@@ -434,7 +437,7 @@ export default function Home() {
               <h3 className="text-4xl md:text-5xl font-serif text-gray-900 mb-6">Nos Meilleures <span className="italic text-gray-500">Réalisations</span></h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(Array.isArray(content.realisations) ? content.realisations : MACOF_DATA.realisations).map((item, idx) => (
+              {(Array.isArray(content.realisations) ? content.realisations : []).map((item, idx) => (
                 <div key={idx} className={`group relative overflow-hidden reveal-up ${idx === 0 || idx === 3 ? 'aspect-[16/9]' : 'aspect-square'}`}>
                   <img 
                     src={getImageUrl(item.image)} 
@@ -466,7 +469,7 @@ export default function Home() {
           
           <div className="relative flex overflow-hidden group">
             <div className="animate-marquee flex gap-16 items-center min-w-full">
-              {(content.partenaires || MACOF_DATA.partenaires).map((p, i) => (
+              {(content.partenaires || []).map((p, i) => (
                 <div key={i} className="flex-shrink-0 flex flex-col items-center justify-center gap-4">
                   <img 
                     src={getImageUrl(p.logo_url)} 
@@ -477,7 +480,7 @@ export default function Home() {
                 </div>
               ))}
               {/* Duplication pour le défilement infini */}
-              {(content.partenaires || MACOF_DATA.partenaires).map((p, i) => (
+              {(content.partenaires || []).map((p, i) => (
                 <div key={`dup-${i}`} className="flex-shrink-0 flex flex-col items-center justify-center gap-4">
                   <img 
                     src={getImageUrl(p.logo_url)} 
@@ -503,7 +506,7 @@ export default function Home() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-              {(content.temoignages || MACOF_DATA.temoignages).map((t, i) => (
+              {(content.temoignages || []).filter((t) => t.active !== false).map((t, i) => (
                 <div key={i} className="reveal-up bg-white border border-gray-100 p-8 shadow-xl relative group hover:-translate-y-2 transition-transform duration-500">
                   <div className="absolute top-8 right-8 text-gray-100 group-hover:text-red-50 transition-colors duration-500">
                     <MessageCircle size={64} className="fill-current" />

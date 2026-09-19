@@ -185,6 +185,37 @@ adminGalerie.post("/", async (c) => {
   return success(c, item[0], "Image ajoutee", 201);
 });
 
+adminGalerie.put("/:id", async (c) => {
+  const id = Number(c.req.param("id"));
+  if (!Number.isInteger(id)) return error(c, "ID invalide", 400);
+
+  const contentType = c.req.header("content-type") || "";
+  let body: any;
+  let image: File | undefined;
+
+  if (contentType.includes("multipart/form-data")) {
+    const form = await c.req.parseBody();
+    body = Object.fromEntries(Object.entries(form).filter(([key]) => key !== "image"));
+    image = form.image instanceof File ? form.image : undefined;
+    if (image) body.image_path = await uploadFile(image, "galerie");
+  } else {
+    body = await c.req.json();
+  }
+
+  if (body.filiale !== undefined && body.filiale !== "") body.filiale = Number(body.filiale);
+  else delete body.filiale;
+
+  const [updated] = await db
+    .update(galerie)
+    .set({ ...body, updated_at: new Date() })
+    .where(eq(galerie.id, id))
+    .returning();
+
+  if (!updated) return error(c, "Element de galerie introuvable", 404);
+  eventEmitter.emit("invalidate", { entity: "galerie" });
+  return success(c, updated, "Realisation mise a jour");
+});
+
 adminGalerie.delete("/:id", async (c) => {
   const id = Number(c.req.param("id"));
 

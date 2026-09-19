@@ -10,19 +10,6 @@ import { Link } from 'react-router-dom';
 
 
 // Helper pour gérer les URLs relatives et absolues d'images
-const FALLBACK_GALERIE = [
-  { id: 1, filiale: "MACOF Immobilier", titre: "Résidence Kaloum", image_path: "https://images.unsplash.com/photo-1778553244173-c5fc6e857120?q=80&w=1000&auto=format&fit=crop", desc: "Projet résidentiel d'envergure, standing international." },
-  { id: 2, filiale: "MACOF Immobilier", titre: "Tour Administrative", image_path: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop", desc: "Construction de bureaux modernes." },
-  { id: 3, filiale: "SEBA International", titre: "Service Traiteur SEBA", image_path: "https://images.unsplash.com/photo-1750943041213-db8328856b48?q=80&w=1000&auto=format&fit=crop", desc: "Organisation de buffets pour événements corporate." },
-  { id: 4, filiale: "SEBA International", titre: "Haute Gastronomie", image_path: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1000&auto=format&fit=crop", desc: "Plats raffinés préparés par nos chefs." },
-  { id: 5, filiale: "MACOF Print & Com", titre: "Impression Offset", image_path: "https://images.unsplash.com/photo-1503694978374-8a2fa686963a?q=80&w=1000&auto=format&fit=crop", desc: "Lignes de production haute capacité." },
-  { id: 6, filiale: "MACOF Print & Com", titre: "Signalétique", image_path: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1000&auto=format&fit=crop", desc: "Création de panneaux publicitaires." },
-  { id: 7, filiale: "MACOF Mining", titre: "Extraction Minière", image_path: "https://images.unsplash.com/photo-1781546441738-b85e43e733e3?q=80&w=1000&auto=format&fit=crop", desc: "Exploitation responsable de carrières." },
-  { id: 8, filiale: "MACOF Transit", titre: "Logistique Portuaire", image_path: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop", desc: "Conteneurs en transit au port." },
-  { id: 9, filiale: "MACOF Fishing", titre: "Flotte Industrielle", image_path: "https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?q=80&w=1000&auto=format&fit=crop", desc: "Navires de pêche équipés HACCP." },
-  { id: 10, filiale: "MACOF Fishing", titre: "Traitement Produits", image_path: "https://images.unsplash.com/photo-1574781330855-d0db8cc6a79c?q=80&w=1000&auto=format&fit=crop", desc: "Usines de filetage certifiées." }
-];
-
 const FILIALE_PAGES = [
   { slug: 'restauration', nom: 'SEBA International' },
   { slug: 'immobilier', nom: 'MACOF Immobilier SARL' },
@@ -40,44 +27,15 @@ export default function Galerie() {
     queryKey: ['galerieData'],
     queryFn: async () => {
       try {
-        const responses = await Promise.all(
-          FILIALE_PAGES.map(async (filiale) => {
-            try {
-              const res = await api.get(`/pages/${filiale.slug}`);
-              return res.data?.success ? { filiale, data: res.data.data } : null;
-            } catch {
-              return null;
-            }
-          })
-        );
-
-        const realisations = responses.flatMap((response) => {
-          const value = response?.data?.realisations;
-          let items: any[] = [];
-
-          try {
-            const parsed = typeof value === 'string' ? JSON.parse(value) : value;
-            items = Array.isArray(parsed) ? parsed : [];
-          } catch {
-            items = [];
-          }
-
-          return items
-            .filter((item) => item?.image)
-            .map((item, index) => ({
-              id: `${response!.filiale.slug}-${item.id || index}`,
-              filiale: response!.filiale.nom,
-              titre: item.title || item.titre || 'Réalisation',
-              image_path: item.image || item.image_path,
-              desc: item.desc || item.description_courte || item.description || '',
-            }));
-        });
-
-        if (realisations.length > 0) return realisations;
+        const res = await api.get('/galerie?limit=100');
+        const items = res.data?.success && Array.isArray(res.data.data?.items)
+          ? res.data.data.items
+          : [];
+        return items;
       } catch (err) {
-        console.warn("API Error réalisations, using fallback");
+        console.warn("API Error galerie");
       }
-      return FALLBACK_GALERIE;
+      return [];
     },
     
   });

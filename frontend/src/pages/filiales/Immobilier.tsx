@@ -74,9 +74,9 @@ export default function Immobilier() {
 
   const [realisations, setRealisations] = useState<any[]>([]);
   useEffect(() => {
-    api.get('/galerie').then(res => {
+    api.get('/galerie?filiale=immobilier&limit=100').then(res => {
       if (res.data.success) {
-        const immoReals = res.data.data.filter((r: any) => r.filiale_nom?.toLowerCase().includes('immobilier'));
+        const immoReals = Array.isArray(res.data.data?.items) ? res.data.data.items : [];
         setRealisations(immoReals);
       }
     });

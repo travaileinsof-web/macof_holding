@@ -72,9 +72,9 @@ export default function Mining() {
 
   const [realisations, setRealisations] = useState<any[]>([]);
   useEffect(() => {
-    api.get('/galerie').then(res => {
+    api.get('/galerie?filiale=mining&limit=100').then(res => {
       if (res.data.success) {
-        const reals = res.data.data.filter((r: any) => r.filiale_nom?.toLowerCase().includes('mining'));
+        const reals = Array.isArray(res.data.data?.items) ? res.data.data.items : [];
         setRealisations(reals);
       }
     });
